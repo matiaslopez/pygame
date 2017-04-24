@@ -1,0 +1,5 @@
+En un windows con pytho y pygame instalado hacer el en el path del source:
+
+python.exe setupPygame.py
+
+luego copiar input.json e imgs adentro de la carpeta dist

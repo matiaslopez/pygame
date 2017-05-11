@@ -1,0 +1,2 @@
+#!/bin/bash
+xterm -e /home/mlopez/repos/matemarote/framework/juegos/avioncito-installer/testeMateMagos2013/src/Avioncito.py

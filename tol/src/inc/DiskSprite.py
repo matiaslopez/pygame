@@ -22,7 +22,7 @@ class DiskSprite(pygame.sprite.DirtySprite):
         self.dirty = 1
 
     def click(self):
-        print "Clicked on Disk ", self.disk.num
+        # print "Clicked on Disk ", self.disk.num
 
         return self.disk.moveable
 
@@ -31,7 +31,7 @@ class DiskSprite(pygame.sprite.DirtySprite):
             p = self.current_pos
         (x,y) = p
         (x_b,y_b) = Properties.stick_pos[x-1]
-        self.rect.midbottom = (x_b,y_b-(Properties.disk_heigth+5)*(y-1))
+        self.rect.midbottom = (x_b,y_b-(Properties.disk_heigth+5)*(y-1)-10)
         self.current_pos = p
         self.dirty = 1
 

@@ -134,7 +134,6 @@ class TowerOfLondon():
         self.logger = FileLogger()
         self.experiment = experiment
         self.mode = EXPERIMENT_MODE
-        self.moving_state = INTERACTIVE
 
         self.screen = pygame.display.get_surface()
         self.clock = pygame.time.Clock()
@@ -187,13 +186,13 @@ class TowerOfLondon():
         self.sprites_group.add(DiskSprite(st.get_disk(State.R),st.get_disk_position(State.R)), layer=DISKS_lyr)
 
         self.goal = pygame.sprite.DirtySprite()
-        self.goalText = Text("Prueba")
-        self.stepsText = Text("Prueba")
-        self.statusText = Text("Prueba")
+        # self.goalText = Text("Prueba")
+        # self.stepsText = Text("Prueba")
+        # self.statusText = Text("Prueba")
         self.sprites_group.add(self.goal, layer=GOAL_lyr)
-        self.sprites_group.add(self.goalText, layer=GOAL_lyr)
-        self.sprites_group.add(self.stepsText, layer=GOAL_lyr)
-        self.sprites_group.add(self.statusText, layer=GOAL_lyr)
+        # self.sprites_group.add(self.goalText, layer=GOAL_lyr)
+        # self.sprites_group.add(self.stepsText , layer=GOAL_lyr)
+        # self.sprites_group.add(self.statusText, layer=GOAL_lyr)
 
 
         self.instruction =  Instruction()
@@ -202,6 +201,7 @@ class TowerOfLondon():
 
         self.msgs = {}
         self.msgs["done"] =  ImageDone()
+        self.msgs["done"].set_callback((lambda: 1))
         for v in self.msgs.itervalues():
             self.sprites_group.add(v, layer=CTRL_BTN_lyr)
 
@@ -209,8 +209,9 @@ class TowerOfLondon():
             self.set_trial)
         self.exp_runner.end_test = self.end_game
         self.exp_runner.instruction = self.instruction
+        self.exp_runner.next()
 
-        self.set_goal(randrange(36))
+        # self.set_goal(randrange(36))
 
         self.clicked_sprite = None
 
@@ -218,14 +219,22 @@ class TowerOfLondon():
             for i in range(1,8+1):
                 self.sprites_group.add(TextLevel(i,self.set_board_distance), layer=LEVEL_SEL_lyr)
 
-        self.change_to_active_mode()
+        self.change_to_active_mode(False)
 
     def change_to_active_mode(self, toActive=True):
         # self.change_background(toActive)
         if toActive:
+            # print "To INTERACTIVE MODE"
             self.msgs["done"].show()
+            self.moving_state = INTERACTIVE
+            self.instruction.hide()
+            self.goal.visible = True
         else:
+            # print "To PASSIVE MODE"
+            self.moving_state = PASSIVE
             self.msgs["done"].hide()
+            self.instruction.show()
+            self.goal.visible = False
 
 
     def set_events(self):
@@ -266,29 +275,30 @@ class TowerOfLondon():
 
         d = inc.distance.dist[board_num][self.state.get_board_number()]
 
-        self.goalText.set_message("Sale en %d movidas" %(d,))
+        # self.goalText.set_message("Sale en %d movidas" %(d,))
 
         self.goal.image = pygame.image.load("images/boards/%02d.png" %(board_num, ))
         self.goal.rect = self.goal.image.get_rect()
         self.goal.rect.topleft = Properties.goal_pos #(Properties.SCREEN_RES[0]-30,30)
         self.goal.dirty = 1
         (x,y) = self.goal.rect.bottomright
-        self.goalText.rect.center = Properties.goal_pos
+        # self.goalText.rect.center = Properties.goal_pos
         self.refresh_indicators()
         self.refresh_all_sprites()
 
 
     def refresh_indicators(self):
-        self.stepsText.set_message("Movidas: %d" %(self.moves_num,))
-        (x,y) = self.goalText.rect.bottomright
-        self.stepsText.rect.topright = (x,y)
-        (x,y) = self.stepsText.rect.bottomright
+        # self.stepsText.set_message("Movidas: %d" %(self.moves_num,))
+        # (x,y) = self.goalText.rect.bottomright
+        # self.stepsText.rect.topright = (x,y)
+        # (x,y) = self.stepsText.rect.bottomright
 
-        if self.state.get_board_number() == self.goal_num:
-            self.statusText.set_message("GANASTE")
-        else:
-            self.statusText.set_message("")
-        self.statusText.rect.topright = (x,y)
+        # if self.state.get_board_number() == self.goal_num:
+            # self.statusText.set_message("GANASTE")
+        # else:
+            # self.statusText.set_message("")
+        # self.statusText.rect.topright = (x,y)
+        pass
 
     def refresh_all_sprites(self):
         for i in self.sprites_group.get_sprites_from_layer(DISKS_lyr):
@@ -317,14 +327,15 @@ class TowerOfLondon():
                     if (i.rect.collidepoint(x, y)):
                         i.click()
         elif self.moving_state == PASSIVE:
-            if self.instruction.visible:
-                self.instruction.hide()
+            self.change_to_active_mode()
 
     def move_mouse(self, res):
         if self.clicked_sprite is not None:
             self.clicked_sprite.set_position(pygame.mouse.get_pos())
 
     def unclicked(self, res):
+        already_placed = False
+        # import pdb; pdb.set_trace()
         if self.clicked_sprite is not None:
             for i in self.sprites_group.get_sprites_from_layer(STICK_lyr):
                 if (i.rect.colliderect(self.clicked_sprite)):
@@ -335,9 +346,16 @@ class TowerOfLondon():
                         self.clicked_sprite = None
                         self.moves_num += 1
                         self.refresh_indicators()
-                        # if self.state.get_board_number() == self.goal_num:
-                            # print "GANASTE"
-                        break
+                        if self.state.get_board_number() == self.goal_num:
+                            print "GANASTE"
+                        already_placed = True
+                        return
+
+            # if not already_placed:
+            self.clicked_sprite.set_stick_pos()
+            self.clicked_sprite = None
+
+
         (x, y) = pygame.mouse.get_pos()
         for i in self.sprites_group.get_sprites_from_layer(CTRL_BTN_lyr):
             if (i.rect.collidepoint(x, y)):
@@ -345,8 +363,6 @@ class TowerOfLondon():
 
 
 
-            self.clicked_sprite.set_stick_pos()
-            self.clicked_sprite = None
 
     def run(self):
         #~ import pdb; pdb.set_trace()
@@ -368,7 +384,8 @@ class TowerOfLondon():
             self.event_handler.handle()
 
 #             dt = self.clock.tick(30)
-            dt = self.clock.tick(100)
+            dt = self.clock.tick(60)
+            self.trial.tic()
             #self.tweener.update(dt / 1000.0)
 
             self.sprites_group.draw(self.screen)

@@ -5,7 +5,7 @@ import Properties
 
 class Instruction(pygame.sprite.DirtySprite):
 
-    def __init__(self, num=2):
+    def __init__(self, moves=2, trial=2):
         super(Instruction, self).__init__()
 
         w, h = Properties.SCREEN_RES
@@ -13,10 +13,10 @@ class Instruction(pygame.sprite.DirtySprite):
         self.font = pygame.font.Font('fonts/Oswald-Bold.ttf', 34)
         self.font2 = pygame.font.Font('fonts/Oswald-Bold.ttf', 18)
 
-        self.set_num(num)
+        self.set_num(moves, trial)
         self.callback = None
 
-    def set_num(self, num, callback=None):
+    def set_num(self, moves, trial, callback=None):
         self.callback = callback
         self.image.fill((30,170,70,250))
 
@@ -25,10 +25,10 @@ class Instruction(pygame.sprite.DirtySprite):
         x = self.rect.centerx
         y = self.rect.height / 3
 
-        t = self.font.render("VAS A VER {} {}".format(num, "LUCES" if num>1 else "LUZ"), True, (0,0,0))
+        t = self.font.render("SALE EN {} MOVIDA{}".format(moves, "S" if moves>1 else ""), True, (0,0,0))
         self.image.blit(t, (x-(t.get_width()/2), y-(t.get_height()/2)))
 
-        t = self.font2.render(u"HACÉ CLICK CON EL MOUSE PARA COMENZAR", True, (0,0,0))
+        t = self.font2.render(u"TRIAL {} - HACÉ CLICK PARA COMENZAR".format(trial), True, (0,0,0))
         y = 4* self.rect.height / 5
         self.image.blit(t, (x-(t.get_width()/2), y))
 

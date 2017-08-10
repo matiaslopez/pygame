@@ -11,9 +11,9 @@ INIT_OP, OP, INIT_FEED, FEED, INIT_SUBJ, SUBJ, END = [ p for p in range(7) ]
 
 class ExpRunner():
 
-    def __init__(self, exp_struct, trial):
+    def __init__(self, exp_struct, set_trial):
         self.exp_struct = exp_struct
-        self.trial = trial
+        self.set_trial = set_trial
         self.set()
         self.instruction = None
 
@@ -46,12 +46,15 @@ class ExpRunner():
 
         t = str(self.current_trial)
         if self.exp_struct["trials"].has_key(t):
-            # print "STARTING WITH trial " + t
 
             src = self.exp_struct["trials"][t][0]
             target = self.exp_struct["trials"][t][1]
             feedback = self.exp_struct["trials"][t][2]
-            self.trial.set(src,target, feedback)
-            self.instruction.set_num(len(sequence), (lambda: self.trial.start(t, sequence, feedback)))
+            moves = self.exp_struct["trials"][t][3]
+            print "STARTING WITH trial {}, from {} to {} ".format(t,src, target)
+            self.set_trial(src,target)
+            # self.set_trial(src,target, feedback)
+            # self.instruction.set_num(moves, t, (lambda: self.trial.start(t, moves, feedback)))
+            self.instruction.set_num(moves, t, (lambda: 1))
         else:
             self.end_test()

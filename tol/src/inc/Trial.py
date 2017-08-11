@@ -14,57 +14,59 @@ current_milli_time = lambda: int(round(time.time() * 1000))
 class Trial():
 
     def __init__(self, logger, change_to_active_mode,
-            handle_end,feedback_handler):
+            handle_end,feedback_handler, tol):
         self.state = None
-        self.running = False
         self.handle_end = None
         self.logger = logger
         self.change_to_active_mode = change_to_active_mode
         self.handle_end = handle_end
         self.feedback_handler = feedback_handler
+        self.tol = tol
+        self.current_trial = None
 
-    def start(self, trial_name ,sequence, feedback):
-        # print "sequence: ", sequence
+    def start(self, trial_name):
+        print "Trial.start -- "
         self.state = INIT
         self.trial_name  = trial_name
-        self.sequence = list(sequence)
         self.init_time = current_milli_time()
-        self.trial_base_line_time = current_milli_time()
-        self.running = True
-        self.feedback = feedback
-        self.correct_answer = True
-        self.current_answer = ""
-        self.logger.log_trial_start(self.trial_name, sequence, feedback)
+        self.logger.log_trial_start(self.trial_name,
+                self.current_trial["source"],
+                self.current_trial["target"],
+                self.current_trial["expected_moves"],
+                self.feedback)
         # self.logger.
 
-    def usr_answer(self, box_name, pos):
+    def set_trial(self, source_num, target_num, feedback, expected_moves):
+        self.current_trial = {"source": source_num, "target": target_num, "expected_moves": expected_moves}
+        self.feedback = feedback
+        self.tol.set_board(source_num)
+        self.tol.set_goal(target_num)
+
+    def check_answer(self):
         # print "--- usr answer - boxclicked: ", self.box_clicked_num, " - current box: ", box_name
         # print " - expected: ", self.sequence[self.box_clicked_num]
-        if self.state == PLAY:
-            delta = current_milli_time() - self.init_time
-            correct = None
-            self.click_num += 1
-            # expected_box_name = self.sequence[min(self.box_clicked_num, len(self.sequence)-1)]
-            expected_box_name = self.sequence[self.box_clicked_num] if self.box_clicked_num < len(self.sequence) else "-"
-            if box_name is not None:
-                if self.box_clicked_num < len(self.sequence):
-                    correct = box_name == expected_box_name
-                    self.correct_answer &=  correct
-                    self.current_answer += box_name
-                    # print "CORRECT" if correct else "INCORRECT"
-                self.box_clicked_num += 1
-            # print "ANSWER in: ", delta
-            (x,y) = pos
-            self.logger.log_click(self.trial_name, self.box_clicked_num, self.click_num, box_name, expected_box_name,
-                delta, correct, x, y)
-            return True
+        print self.tol.state.get_board_number(), self.current_trial
+        print self.state
+        delta = current_milli_time() - self.init_time
+        if (self.tol.state.get_board_number()==self.current_trial["target"] and
+            self.tol.moves_num==self.current_trial["expected_moves"]):
+            correct = True
         else:
-            return False
+            correct = False
+
+        self.logger.log_trial_result(self.trial_name,
+                correct,
+                self.tol.moves_num,
+                self.current_trial["expected_moves"],
+                self.tol.sequence_boards)
+
+        self.tol.change_to_active_mode(False)
+
+        return correct
 
     def next_by_usr(self):
         if self.state == END:
             self.next()
-
 
     def next(self):
         self.init_time = current_milli_time()
@@ -110,33 +112,33 @@ class Trial():
         self.target_img.hide()
         self.feed.hide()
 
-    def tic(self):
-        if self.running:
-            if self.state == INIT:
-                if self.init_time + self.properties["tprev"]  < current_milli_time():
-                    self.next()
-            elif self.state == STIM:
-                appear_time = self.stim_index * (self.properties["tstim"] + self.properties["tinterstim"])
-                if self.init_time + appear_time < current_milli_time():
-                    if self.stim_index >= len(self.sequence):
-                        self.next()
-                        # print "END of STIM"
-                    else:
-                        current_box_id = self.sequence[self.stim_index]
-                        self.boxes[current_box_id].click(self.properties["tstim"], self.unsuscribe_box)
-                        self.suscribe_box(self.boxes[current_box_id])
-                        self.stim_index += 1
-            elif self.state == WAIT:
-                if self.init_time + self.properties["tprev"]  < current_milli_time():
-                    self.next()
-            elif self.state == FEEDBACK:
-                if self.init_time + self.properties["tfeedback"]  < current_milli_time():
-                    self.next()
-            # elif self.state == ANSW:
-                # if (self.init_time + self.properties["timeoutextra"] +
-                    # self.properties["timeoutperanswer"] * len(self.sequence)) < current_milli_time():
-                    # self.next()
-            # elif self.state == END:
-                # if self.init_time + self.properties["tprev"]  < current_milli_time():
-                    # self.next()
+    # def tic(self):
+    #     if self.running:
+    #         if self.state == INIT:
+    #             if self.init_time + self.properties["tprev"]  < current_milli_time():
+    #                 self.next()
+    #         elif self.state == STIM:
+    #             appear_time = self.stim_index * (self.properties["tstim"] + self.properties["tinterstim"])
+    #             if self.init_time + appear_time < current_milli_time():
+    #                 if self.stim_index >= len(self.sequence):
+    #                     self.next()
+    #                     # print "END of STIM"
+    #                 else:
+    #                     current_box_id = self.sequence[self.stim_index]
+    #                     self.boxes[current_box_id].click(self.properties["tstim"], self.unsuscribe_box)
+    #                     self.suscribe_box(self.boxes[current_box_id])
+    #                     self.stim_index += 1
+    #         elif self.state == WAIT:
+    #             if self.init_time + self.properties["tprev"]  < current_milli_time():
+    #                 self.next()
+    #         elif self.state == FEEDBACK:
+    #             if self.init_time + self.properties["tfeedback"]  < current_milli_time():
+    #                 self.next()
+    #         # elif self.state == ANSW:
+    #             # if (self.init_time + self.properties["timeoutextra"] +
+    #                 # self.properties["timeoutperanswer"] * len(self.sequence)) < current_milli_time():
+    #                 # self.next()
+    #         # elif self.state == END:
+    #             # if self.init_time + self.properties["tprev"]  < current_milli_time():
+    #                 # self.next()
 

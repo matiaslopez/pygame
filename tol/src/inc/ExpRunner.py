@@ -11,9 +11,9 @@ INIT_OP, OP, INIT_FEED, FEED, INIT_SUBJ, SUBJ, END = [ p for p in range(7) ]
 
 class ExpRunner():
 
-    def __init__(self, exp_struct, set_trial):
+    def __init__(self, exp_struct, trial):
         self.exp_struct = exp_struct
-        self.set_trial = set_trial
+        self.trial = trial
         self.set()
         self.instruction = None
 
@@ -52,9 +52,9 @@ class ExpRunner():
             feedback = self.exp_struct["trials"][t][2]
             moves = self.exp_struct["trials"][t][3]
             print "STARTING WITH trial {}, from {} to {} ".format(t,src, target)
-            self.set_trial(src,target)
+            self.trial.set_trial(src,target, moves, feedback)
             # self.set_trial(src,target, feedback)
-            # self.instruction.set_num(moves, t, (lambda: self.trial.start(t, moves, feedback)))
-            self.instruction.set_num(moves, t, (lambda: 1))
+            self.instruction.set_num(moves, t, (lambda: self.trial.start(t)))
+            # self.instruction.set_num(moves, t, self.trial.)
         else:
             self.end_test()

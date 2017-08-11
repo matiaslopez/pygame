@@ -39,3 +39,11 @@ class DiskSprite(pygame.sprite.DirtySprite):
     def set_position(self, pos):
         self.rect.center = pos
         self.dirty = 1
+
+    def hide(self):
+        self.visible =  False
+        self.dirty = True
+
+    def show(self):
+        self.visible =  True
+        self.dirty = True

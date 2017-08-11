@@ -80,26 +80,27 @@ class FileLogger():
 
         self.write_down(str_store)
 
-    def log_trial_result(self, trial_id, correct, box_clicked_num,
-                number_of_clicks, expected_sequence, result_sequence):
+    def log_trial_result(self, trial_id, correct, moves_num,
+                expected_moves, sequence_boards):
         str_store = []
         str_store.append("RESULT")
         str_store.append(str(datetime.datetime.today().strftime("[%Y-%m-%d %H.%M.%S] ")))
         str_store.append(str(trial_id))
         str_store.append(str(correct))
-        str_store.append(str(box_clicked_num))
-        str_store.append(str(number_of_clicks))
-        str_store.append(str(expected_sequence))
-        str_store.append(str(result_sequence))
+        str_store.append(str(moves_num))
+        str_store.append(str(expected_moves))
+        str_store.append(json.dumps(sequence_boards))
 
         self.write_down(str_store)
 
-    def log_trial_start(self, trial_id, sequence, feedback):
+    def log_trial_start(self, trial_id, source, target, expected_moves, feedback):
         str_store = []
         str_store.append("TRIAL START")
         str_store.append(str(datetime.datetime.today().strftime("[%Y-%m-%d %H.%M.%S] ")))
         str_store.append(str(trial_id))
-        str_store.append(str(sequence))
+        str_store.append(str(source))
+        str_store.append(str(target))
+        str_store.append(str(expected_moves))
         str_store.append(str(feedback))
 
         self.write_down(str_store)
@@ -120,8 +121,8 @@ class FileLogger():
 
     def write_down(self, arr):
         str_store = ";".join(arr)
+        print "LOG ENTRY", str_store
         str_store = str_store + ";\n"
-
         self.f.write(str_store)
 
     def close(self):
@@ -168,7 +169,8 @@ class TowerOfLondon():
         self.trial = Trial(self.logger, self.change_to_active_mode,
                 None,
                 {"ok": self.feedback_ok.show, "no": self.feedback_no.show,
-                "off": (lambda: [self.feedback_ok.hide(), self.feedback_no.hide()])})
+                "off": (lambda: [self.feedback_ok.hide(), self.feedback_no.hide()])},
+                self)
 
         # self.state.show()
 
@@ -201,12 +203,12 @@ class TowerOfLondon():
 
         self.msgs = {}
         self.msgs["done"] =  ImageDone()
-        self.msgs["done"].set_callback((lambda: 1))
+        self.msgs["done"].set_callback(self.trial.check_answer)
         for v in self.msgs.itervalues():
             self.sprites_group.add(v, layer=CTRL_BTN_lyr)
 
         self.exp_runner = ExpRunner(self.experiment,
-            self.set_trial)
+            self.trial)
         self.exp_runner.end_test = self.end_game
         self.exp_runner.instruction = self.instruction
         self.exp_runner.next()
@@ -229,12 +231,17 @@ class TowerOfLondon():
             self.moving_state = INTERACTIVE
             self.instruction.hide()
             self.goal.visible = True
+            for sp in self.sprites_group.get_sprites_from_layer(DISKS_lyr):
+                sp.show()
+
         else:
             # print "To PASSIVE MODE"
             self.moving_state = PASSIVE
             self.msgs["done"].hide()
             self.instruction.show()
             self.goal.visible = False
+            for sp in self.sprites_group.get_sprites_from_layer(DISKS_lyr):
+                sp.hide()
 
 
     def set_events(self):
@@ -261,9 +268,7 @@ class TowerOfLondon():
         self.set_board(l1)
         self.set_goal(l2)
 
-    def set_trial(self, source_num, target_num):
-        self.set_board(source_num)
-        self.set_goal(target_num)
+
 
     def set_board(self, board_num):
         self.state.set_board_number(board_num)
@@ -272,6 +277,7 @@ class TowerOfLondon():
     def set_goal(self, board_num):
         self.goal_num = board_num
         self.moves_num = 0
+        self.sequence_boards = [self.state.get_board_number()]
 
         d = inc.distance.dist[board_num][self.state.get_board_number()]
 
@@ -345,6 +351,7 @@ class TowerOfLondon():
                         self.state.moveSP(self.clicked_sprite, i)
                         self.clicked_sprite = None
                         self.moves_num += 1
+                        self.sequence_boards.append(self.state.get_board_number())
                         self.refresh_indicators()
                         if self.state.get_board_number() == self.goal_num:
                             print "GANASTE"
@@ -385,7 +392,7 @@ class TowerOfLondon():
 
 #             dt = self.clock.tick(30)
             dt = self.clock.tick(60)
-            self.trial.tic()
+            # self.trial.tic()
             #self.tweener.update(dt / 1000.0)
 
             self.sprites_group.draw(self.screen)

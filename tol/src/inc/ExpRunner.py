@@ -49,10 +49,10 @@ class ExpRunner():
 
             src = self.exp_struct["trials"][t][0]
             target = self.exp_struct["trials"][t][1]
-            feedback = self.exp_struct["trials"][t][2]
+            feedback = json.loads(self.exp_struct["trials"][t][2])
             moves = self.exp_struct["trials"][t][3]
             print "STARTING WITH trial {}, from {} to {} ".format(t,src, target)
-            self.trial.set_trial(src,target, moves, feedback)
+            self.trial.set_trial(src,target, feedback, moves)
             # self.set_trial(src,target, feedback)
             self.instruction.set_num(moves, t, (lambda: self.trial.start(t)))
             # self.instruction.set_num(moves, t, self.trial.)

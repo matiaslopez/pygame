@@ -33,7 +33,7 @@ class Instruction(pygame.sprite.DirtySprite):
         self.image.blit(t, (x-(t.get_width()/2), y))
 
         self.rect.center = pygame.display.get_surface().get_rect().center
-        self.show()
+        # self.show()
 
     def hide(self):
         self.visible =  False

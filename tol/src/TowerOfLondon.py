@@ -16,6 +16,7 @@ from inc.ImageMessage import *
 from inc.Instruction import *
 from inc.ExpRunner import *
 from inc.Trial import *
+from inc.Goal import *
 
 
 import inc.distance
@@ -26,7 +27,7 @@ import inc.distance
     ) = [ p for p in range(0,12) ]
 
 EXPERIMENT_MODE, FREE_MODE = [ p for p in range(0,2) ]
-INTERACTIVE, PASSIVE = [ p for p in range(0,2) ]
+INTERACTIVE, PASSIVE, FEEDBACK = [ p for p in range(0,3) ]
 
 # SUBJECT_NAME = raw_input('Nombre: ')
 SUBJECT_NAME = 'Nombre: '
@@ -93,15 +94,15 @@ class FileLogger():
 
         self.write_down(str_store)
 
-    def log_trial_start(self, trial_id, source, target, expected_moves, feedback):
+    def log_trial_start(self, trial_id, source, target, feedback, expected_moves):
         str_store = []
         str_store.append("TRIAL START")
         str_store.append(str(datetime.datetime.today().strftime("[%Y-%m-%d %H.%M.%S] ")))
         str_store.append(str(trial_id))
         str_store.append(str(source))
         str_store.append(str(target))
-        str_store.append(str(expected_moves))
         str_store.append(str(feedback))
+        str_store.append(str(expected_moves))
 
         self.write_down(str_store)
 
@@ -166,35 +167,23 @@ class TowerOfLondon():
         self.state = State.State()
         st = self.state
 
-        self.trial = Trial(self.logger, self.change_to_active_mode,
+        self.trial = Trial(self.logger, self.show_messages,
                 None,
                 {"ok": self.feedback_ok.show, "no": self.feedback_no.show,
                 "off": (lambda: [self.feedback_ok.hide(), self.feedback_no.hide()])},
                 self)
-
-        # self.state.show()
 
         self.sprites_group.add(StickSprite(st.sticks[1]), layer=STICK_lyr)
         self.sprites_group.add(StickSprite(st.sticks[2]), layer=STICK_lyr)
         self.sprites_group.add(StickSprite(st.sticks[3]), layer=STICK_lyr)
 
 
-        # print "R: ", st.get_disk_position(State.R)
-        # print "G: ", st.get_disk_position(State.G)
-        # print "B: ", st.get_disk_position(State.B)
-
         self.sprites_group.add(DiskSprite(st.get_disk(State.B),st.get_disk_position(State.B)), layer=DISKS_lyr)
         self.sprites_group.add(DiskSprite(st.get_disk(State.G),st.get_disk_position(State.G)), layer=DISKS_lyr)
         self.sprites_group.add(DiskSprite(st.get_disk(State.R),st.get_disk_position(State.R)), layer=DISKS_lyr)
 
-        self.goal = pygame.sprite.DirtySprite()
-        # self.goalText = Text("Prueba")
-        # self.stepsText = Text("Prueba")
-        # self.statusText = Text("Prueba")
+        self.goal = Goal()
         self.sprites_group.add(self.goal, layer=GOAL_lyr)
-        # self.sprites_group.add(self.goalText, layer=GOAL_lyr)
-        # self.sprites_group.add(self.stepsText , layer=GOAL_lyr)
-        # self.sprites_group.add(self.statusText, layer=GOAL_lyr)
 
 
         self.instruction =  Instruction()
@@ -213,7 +202,6 @@ class TowerOfLondon():
         self.exp_runner.instruction = self.instruction
         self.exp_runner.next()
 
-        # self.set_goal(randrange(36))
 
         self.clicked_sprite = None
 
@@ -221,27 +209,33 @@ class TowerOfLondon():
             for i in range(1,8+1):
                 self.sprites_group.add(TextLevel(i,self.set_board_distance), layer=LEVEL_SEL_lyr)
 
-        self.change_to_active_mode(False)
+        self.show_messages(False)
 
-    def change_to_active_mode(self, toActive=True):
+    def show_messages(self, toActive=True, info_or_feedback=2):
         # self.change_background(toActive)
+        # print "To PASSIVE MODE"
+        for i in [GOAL_lyr, DISKS_lyr, CTRL_BTN_lyr,FEED_lyr, INST_lyr]:
+            for sp in self.sprites_group.get_sprites_from_layer(i):
+                sp.hide()
         if toActive:
             # print "To INTERACTIVE MODE"
-            self.msgs["done"].show()
+            # self.msgs["done"].show()
             self.moving_state = INTERACTIVE
-            self.instruction.hide()
-            self.goal.visible = True
-            for sp in self.sprites_group.get_sprites_from_layer(DISKS_lyr):
-                sp.show()
-
+            # self.instruction.hide()
+            # self.goal.visible = True
+            for i in [GOAL_lyr, DISKS_lyr, CTRL_BTN_lyr]:
+                for sp in self.sprites_group.get_sprites_from_layer(i):
+                    sp.show()
         else:
-            # print "To PASSIVE MODE"
-            self.moving_state = PASSIVE
-            self.msgs["done"].hide()
-            self.instruction.show()
-            self.goal.visible = False
-            for sp in self.sprites_group.get_sprites_from_layer(DISKS_lyr):
-                sp.hide()
+            if info_or_feedback==2:
+                self.moving_state = PASSIVE
+                self.instruction.show()
+            else:
+                self.moving_state = FEEDBACK
+                if info_or_feedback==1:
+                    self.feedback_ok.show()
+                elif info_or_feedback==0:
+                    self.feedback_no.show()
 
 
     def set_events(self):
@@ -282,12 +276,7 @@ class TowerOfLondon():
         d = inc.distance.dist[board_num][self.state.get_board_number()]
 
         # self.goalText.set_message("Sale en %d movidas" %(d,))
-
-        self.goal.image = pygame.image.load("images/boards/%02d.png" %(board_num, ))
-        self.goal.rect = self.goal.image.get_rect()
-        self.goal.rect.topleft = Properties.goal_pos #(Properties.SCREEN_RES[0]-30,30)
-        self.goal.dirty = 1
-        (x,y) = self.goal.rect.bottomright
+        self.goal.set(board_num)
         # self.goalText.rect.center = Properties.goal_pos
         self.refresh_indicators()
         self.refresh_all_sprites()
@@ -315,25 +304,19 @@ class TowerOfLondon():
         self.set_board_distance()
 
     def clicked(self, res):
-        (x, y) = pygame.mouse.get_pos()
         if self.moving_state == INTERACTIVE:
+            (x, y) = pygame.mouse.get_pos()
             for i in self.sprites_group.get_sprites_from_layer(DISKS_lyr):
                 if (i.rect.collidepoint(x, y)):
                     r = i.click()
-
                     if r:
                         self.clicked_sprite = i
 
             for i in self.sprites_group.get_sprites_from_layer(CTRL_BTN_lyr):
                 if (i.rect.collidepoint(x, y)):
+                    print "Clicked"
                     i.click()
 
-            if self.mode==FREE_MODE:
-                for i in self.sprites_group.get_sprites_from_layer(LEVEL_SEL_lyr):
-                    if (i.rect.collidepoint(x, y)):
-                        i.click()
-        elif self.moving_state == PASSIVE:
-            self.change_to_active_mode()
 
     def move_mouse(self, res):
         if self.clicked_sprite is not None:
@@ -362,14 +345,15 @@ class TowerOfLondon():
             self.clicked_sprite.set_stick_pos()
             self.clicked_sprite = None
 
-
-        (x, y) = pygame.mouse.get_pos()
-        for i in self.sprites_group.get_sprites_from_layer(CTRL_BTN_lyr):
-            if (i.rect.collidepoint(x, y)):
-                i.release_click()
-
-
-
+        if self.moving_state == INTERACTIVE:
+            (x, y) = pygame.mouse.get_pos()
+            for i in self.sprites_group.get_sprites_from_layer(CTRL_BTN_lyr):
+                if (i.rect.collidepoint(x, y)):
+                    i.release_click()
+        elif self.moving_state == PASSIVE:
+            self.show_messages()
+        elif self.moving_state == FEEDBACK:
+            self.show_messages(False)
 
     def run(self):
         #~ import pdb; pdb.set_trace()

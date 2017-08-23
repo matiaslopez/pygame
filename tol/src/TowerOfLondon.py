@@ -29,8 +29,8 @@ import inc.distance
 EXPERIMENT_MODE, FREE_MODE = [ p for p in range(0,2) ]
 INTERACTIVE, PASSIVE, FEEDBACK = [ p for p in range(0,3) ]
 
-# SUBJECT_NAME = raw_input('Nombre: ')
-SUBJECT_NAME = 'Nombre: '
+SUBJECT_NAME = raw_input('Nombre: ')
+# SUBJECT_NAME = 'Nombre: '
 
 class FileLogger():
 
@@ -65,21 +65,21 @@ class FileLogger():
         self.write_down(str_store)
 
 
-    def log_click(self, trial_id, box_clicked_num, click_num, box_name, expected_box_name, time, correct, x, y):
-        str_store = []
-        str_store.append("CLICK")
-        str_store.append(str(datetime.datetime.today().strftime("[%Y-%m-%d %H.%M.%S] ")))
-        str_store.append(str(trial_id))
-        str_store.append(str(box_clicked_num))
-        str_store.append(str(click_num))
-        str_store.append(str(box_name))
-        str_store.append(str(expected_box_name))
-        str_store.append(str(time))
-        str_store.append(str(correct))
-        str_store.append(str(x))
-        str_store.append(str(y))
+    # def log_click(self, trial_id, box_clicked_num, click_num, box_name, expected_box_name, time, correct, x, y):
+    #     str_store = []
+    #     str_store.append("CLICK")
+    #     str_store.append(str(datetime.datetime.today().strftime("[%Y-%m-%d %H.%M.%S] ")))
+    #     str_store.append(str(trial_id))
+    #     str_store.append(str(box_clicked_num))
+    #     str_store.append(str(click_num))
+    #     str_store.append(str(box_name))
+    #     str_store.append(str(expected_box_name))
+    #     str_store.append(str(time))
+    #     str_store.append(str(correct))
+    #     str_store.append(str(x))
+    #     str_store.append(str(y))
 
-        self.write_down(str_store)
+    #     self.write_down(str_store)
 
     def log_trial_result(self, trial_id, correct, moves_num,
                 expected_moves, sequence_boards):
@@ -106,12 +106,33 @@ class FileLogger():
 
         self.write_down(str_store)
 
-    def log_invalid_press(self):
+    def log_pick_disk(self, trial_id, source, target, current_board, move_num, picked_disk):
         str_store = []
-        str_store.append("INVALID PRESS")
+        str_store.append("PICK DISK")
         str_store.append(str(datetime.datetime.today().strftime("[%Y-%m-%d %H.%M.%S] ")))
+        str_store.append(str(trial_id))
+        str_store.append(str(source))
+        str_store.append(str(target))
+        str_store.append(str(current_board))
+        str_store.append(str(move_num))
+        str_store.append(str(picked_disk))
 
         self.write_down(str_store)
+
+    def log_release_disk(self, trial_id, source, target, current_board, move_num, released_disk, new_position):
+        str_store = []
+        str_store.append("RELEASE DISK")
+        str_store.append(str(datetime.datetime.today().strftime("[%Y-%m-%d %H.%M.%S] ")))
+        str_store.append(str(trial_id))
+        str_store.append(str(source))
+        str_store.append(str(target))
+        str_store.append(str(current_board))
+        str_store.append(str(move_num))
+        str_store.append(str(released_disk))
+        str_store.append(str(new_position))
+
+        self.write_down(str_store)
+
 
     def log_message(self, message):
         str_store = []
@@ -311,7 +332,15 @@ class TowerOfLondon():
                     r = i.click()
                     if r:
                         self.clicked_sprite = i
-
+                        self.logger.log_pick_disk(self.exp_runner.trial.trial_name,
+                                                self.trial.current_trial["source"],
+                                                self.trial.current_trial["target"],
+                                                self.state.get_board_number(),
+                                                self.trial.tol.moves_num,
+                                                i.disk.num
+                                                )
+                        # self, trial_id, source, target, current_board, move_num,
+                        # picked_disk
             for i in self.sprites_group.get_sprites_from_layer(CTRL_BTN_lyr):
                 if (i.rect.collidepoint(x, y)):
                     print "Clicked"
@@ -326,6 +355,7 @@ class TowerOfLondon():
         already_placed = False
         # import pdb; pdb.set_trace()
         if self.clicked_sprite is not None:
+            qq = self.clicked_sprite
             for i in self.sprites_group.get_sprites_from_layer(STICK_lyr):
                 if (i.rect.colliderect(self.clicked_sprite)):
                     # print "Left on Stick ", i.stick.num
@@ -336,14 +366,30 @@ class TowerOfLondon():
                         self.moves_num += 1
                         self.sequence_boards.append(self.state.get_board_number())
                         self.refresh_indicators()
-                        if self.state.get_board_number() == self.goal_num:
-                            print "GANASTE"
+                        # if self.state.get_board_number() == self.goal_num:
+                            # print "GANASTE"
                         already_placed = True
+                        self.logger.log_release_disk(self.exp_runner.trial.trial_name,
+                                                self.trial.current_trial["source"],
+                                                self.trial.current_trial["target"],
+                                                self.state.get_board_number(),
+                                                self.trial.tol.moves_num,
+                                                qq.disk.num,
+                                                True
+                                                )
                         return
 
             # if not already_placed:
             self.clicked_sprite.set_stick_pos()
             self.clicked_sprite = None
+            self.logger.log_release_disk(self.exp_runner.trial.trial_name,
+                                    self.trial.current_trial["source"],
+                                    self.trial.current_trial["target"],
+                                    self.state.get_board_number(),
+                                    self.trial.tol.moves_num,
+                                    qq.disk.num,
+                                    False
+                                    )
 
         if self.moving_state == INTERACTIVE:
             (x, y) = pygame.mouse.get_pos()

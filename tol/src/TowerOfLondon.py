@@ -143,7 +143,7 @@ class FileLogger():
 
     def write_down(self, arr):
         str_store = ";".join(arr)
-        print "LOG ENTRY", str_store
+        # print "LOG ENTRY", str_store
         str_store = str_store + ";\n"
         self.f.write(str_store)
 
@@ -343,7 +343,7 @@ class TowerOfLondon():
                         # picked_disk
             for i in self.sprites_group.get_sprites_from_layer(CTRL_BTN_lyr):
                 if (i.rect.collidepoint(x, y)):
-                    print "Clicked"
+                    # print "Clicked"
                     i.click()
 
 

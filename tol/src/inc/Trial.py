@@ -42,7 +42,7 @@ class Trial():
                                 "target": target_num,
                                 "feedback": feedback,
                                 "expected_moves": expected_moves}
-        print self.current_trial
+        # print self.current_trial
 
         self.tol.set_board(source_num)
         self.tol.set_goal(target_num)

@@ -31,7 +31,9 @@ stick_rect = [
               pygame.Rect(0, 0, stick_width, (stick_heigth+05)*3+15),
          ]
 
-stick_pos = [(200,500), (400,500), (600,500)]
+floor_height = 50
+
+stick_pos = [(200, y - floor_height), (400,y - floor_height), (600,y - floor_height)]
 
 img_done_pos = (1.05* x, 0.32 * y)
 

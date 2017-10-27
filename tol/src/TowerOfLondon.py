@@ -30,7 +30,12 @@ EXPERIMENT_MODE, FREE_MODE = [ p for p in range(0,2) ]
 INTERACTIVE, PASSIVE, FEEDBACK = [ p for p in range(0,3) ]
 
 SUBJECT_NAME = raw_input('Nombre: ')
-# SUBJECT_NAME = 'Nombre: '
+BACKGROUND_PROFILE = raw_input('Perfil de fondo (1, 2, 3 4, 5 o 6): ')
+# DISKS_PROFILE = raw_input('Perfil de piezas (1 por defecto): ')
+
+# SUBJECT_NAME = 'Nombre'
+# BACKGROUND_PROFILE = 1
+DISKS_PROFILE = 1
 
 class FileLogger():
 
@@ -41,7 +46,10 @@ class FileLogger():
             os.makedirs(directory)
 
         d = datetime.datetime.today().strftime("%Y-%m-%d_%H.%M.%S")
-        file_name = SUBJECT_NAME + "_" + d + ".csv"
+        file_name = (SUBJECT_NAME + "_" +
+                     "BACK_" + str(BACKGROUND_PROFILE) + "_" +
+                     "DISK_" + str(DISKS_PROFILE) + "_" +
+                    d + ".csv")
         file_path = os.path.join(directory, file_name)
 
         self.f = open(file_path, 'w')
@@ -166,14 +174,17 @@ class TowerOfLondon():
 
         self.sprites_group = pygame.sprite.LayeredDirty()
 
-        self.background = pygame.sprite.DirtySprite()
-        self.background.image = pygame.surface.Surface(Properties.SCREEN_RES)
-        self.background.image.fill([240,240,240])
-        self.background.rect = self.background.image.get_rect()
+        # self.background = pygame.sprite.DirtySprite()
+        self.background =  ImageMessage("scale_fondo{}.png".format(BACKGROUND_PROFILE))
+        self.background.show()
+
+        # self.background.image = pygame.surface.Surface(Properties.SCREEN_RES)
+        # self.background.image.fill([240,240,240])
+        # self.background.rect = self.background.image.get_rect()
         self.sprites_group.add(self.background, layer=BACKGR_lyr)
 
         self.floor = pygame.sprite.DirtySprite()
-        self.floor.image = pygame.surface.Surface((800, 100))
+        self.floor.image = pygame.surface.Surface((800, Properties.floor_height))
         self.floor.image.fill([0,200,0])
         self.floor.rect = self.floor.image.get_rect()
         self.floor.rect.bottom = Properties.SCREEN_RES[1]
@@ -416,6 +427,7 @@ class TowerOfLondon():
     def mainLoop(self):
         # print "MainLoop"
         pygame.display.flip()
+        # pygame.image.save(out,fname+".tga")
 
         while self.running:
             self.event_handler.handle()
@@ -427,6 +439,8 @@ class TowerOfLondon():
 
             self.sprites_group.draw(self.screen)
             pygame.display.flip()
+
+        # pygame.image.save(pygame.display.get_surface(), "screenshot.png")
 
 def main():
     pygame.init()

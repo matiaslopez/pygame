@@ -5,17 +5,22 @@ import Properties as Properties
 
 class DiskSprite(pygame.sprite.DirtySprite):
 
-    def __init__(self, disk, (x,y)):
+    def __init__(self, disk, coord, mode=3, is_img = False):
         super(DiskSprite, self).__init__()
 
         self.disk = disk
         num = self.disk.num
 
-        self.image = pygame.Surface(Properties.disk_rect.size)
-        self.image.fill(Properties.disk_colors[num-1])
-        self.rect = pygame.Rect(Properties.disk_rect)
+        # self.image = pygame.Surface(Properties.disk_rect.size)
+        # self.image.fill(Properties.disk_colors[num-1])
+        # self.rect = pygame.Rect(Properties.disk_rect)
 
-        self.set_stick_pos((x,y))
+        self.image = pygame.transform.scale(pygame.image.load("images/mode_%d_disk_%d.png" %(mode,num, )), Properties.disk_rect.size)
+        self.rect = self.image.get_rect()
+        # self.rect.topleft = Properties.goal_pos #(Properties.SCREEN_RES[0]-30,30)
+        self.dirty = 1
+
+        self.set_stick_pos(coord)
 
     def newpos(self):
         self.rect.center = (self.x, self.y)
@@ -31,7 +36,7 @@ class DiskSprite(pygame.sprite.DirtySprite):
             p = self.current_pos
         (x,y) = p
         (x_b,y_b) = Properties.stick_pos[x-1]
-        self.rect.midbottom = (x_b,y_b-(Properties.disk_heigth+5)*(y-1)-10)
+        self.rect.midbottom = (x_b,y_b-(Properties.disk_height+5)*(y-1)-10)
         self.current_pos = p
         self.dirty = 1
 

@@ -29,13 +29,15 @@ import inc.distance
 EXPERIMENT_MODE, FREE_MODE = [ p for p in range(0,2) ]
 INTERACTIVE, PASSIVE, FEEDBACK = [ p for p in range(0,3) ]
 
-SUBJECT_NAME = raw_input('Nombre: ')
-BACKGROUND_PROFILE = raw_input('Perfil de fondo (1, 2, 3 4, 5 o 6): ')
+# SUBJECT_NAME = raw_input('Nombre: ')
+SUBJECT_NAME = "Q"
+# BACKGROUND_PROFILE = raw_input('Perfil de fondo (1, 2, 3 4, 5 o 6): ')
+BACKGROUND_PROFILE = 2
 # DISKS_PROFILE = raw_input('Perfil de piezas (1 por defecto): ')
 
 # SUBJECT_NAME = 'Nombre'
 # BACKGROUND_PROFILE = 1
-DISKS_PROFILE = 1
+DISKS_PROFILE = 2
 
 class FileLogger():
 
@@ -184,7 +186,7 @@ class TowerOfLondon():
         self.sprites_group.add(self.background, layer=BACKGR_lyr)
 
         self.floor = pygame.sprite.DirtySprite()
-        self.floor.image = pygame.surface.Surface((800, Properties.floor_height))
+        self.floor.image = pygame.surface.Surface((Properties.SCREEN_RES[0], Properties.floor_height))
         self.floor.image.fill([0,200,0])
         self.floor.rect = self.floor.image.get_rect()
         self.floor.rect.bottom = Properties.SCREEN_RES[1]
@@ -210,11 +212,11 @@ class TowerOfLondon():
         self.sprites_group.add(StickSprite(st.sticks[3]), layer=STICK_lyr)
 
 
-        self.sprites_group.add(DiskSprite(st.get_disk(State.B),st.get_disk_position(State.B)), layer=DISKS_lyr)
-        self.sprites_group.add(DiskSprite(st.get_disk(State.G),st.get_disk_position(State.G)), layer=DISKS_lyr)
-        self.sprites_group.add(DiskSprite(st.get_disk(State.R),st.get_disk_position(State.R)), layer=DISKS_lyr)
+        self.sprites_group.add(DiskSprite(st.get_disk(State.B),st.get_disk_position(State.B), mode=DISKS_PROFILE), layer=DISKS_lyr)
+        self.sprites_group.add(DiskSprite(st.get_disk(State.G),st.get_disk_position(State.G), mode=DISKS_PROFILE), layer=DISKS_lyr)
+        self.sprites_group.add(DiskSprite(st.get_disk(State.R),st.get_disk_position(State.R), mode=DISKS_PROFILE), layer=DISKS_lyr)
 
-        self.goal = Goal()
+        self.goal = Goal(DISKS_PROFILE)
         self.sprites_group.add(self.goal, layer=GOAL_lyr)
 
 

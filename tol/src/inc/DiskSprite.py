@@ -15,7 +15,7 @@ class DiskSprite(pygame.sprite.DirtySprite):
         # self.image.fill(Properties.disk_colors[num-1])
         # self.rect = pygame.Rect(Properties.disk_rect)
 
-        self.image = pygame.transform.scale(pygame.image.load("images/mode_%d_disk_%d.png" %(mode,num, )), Properties.disk_rect.size)
+        self.image = pygame.transform.scale(pygame.image.load("images/mode_%s_disk_%s.png" %(mode,num, )), Properties.disk_rect.size)
         self.rect = self.image.get_rect()
         # self.rect.topleft = Properties.goal_pos #(Properties.SCREEN_RES[0]-30,30)
         self.dirty = 1

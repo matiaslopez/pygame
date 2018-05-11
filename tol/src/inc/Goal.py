@@ -17,9 +17,6 @@ class Goal(pygame.sprite.DirtySprite):
         board = State.State()
         board.set_board_number(board_num)
 
-        self.image = pygame.image.load("images/boards/%02d.png" %(board_num, ))
-        self.image = pygame.image.load("images/boards/empty.png")
-
         self.image = pygame.surface.Surface((
                                             int(Properties.SCREEN_RES[0] * Properties.goal_scale),
                                             int(Properties.SCREEN_RES[1] * Properties.goal_scale)))

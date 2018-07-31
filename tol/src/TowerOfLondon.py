@@ -30,8 +30,8 @@ EXPERIMENT_MODE, FREE_MODE = [ p for p in range(0,2) ]
 INTERACTIVE, PASSIVE, FEEDBACK = [ p for p in range(0,3) ]
 
 SUBJECT_NAME = raw_input('Nombre: ')
-BACKGROUND_PROFILE = raw_input('Perfil de fondo (1, 2, 3 4, 5 o 6): ')
-DISKS_PROFILE = raw_input('Perfil de piezas (1 por defecto): ')
+BACKGROUND_PROFILE = 7 #raw_input('Perfil de fondo (1, 2, 3 4, 5 o 6): ')
+DISKS_PROFILE = 1 #raw_input('Perfil de piezas (1 por defecto): ')
 
 # SUBJECT_NAME = "Q"
 # BACKGROUND_PROFILE = 2

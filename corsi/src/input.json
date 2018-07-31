@@ -1,8 +1,8 @@
 {
     "properties": {
         "tprev": 500,
-        "tstim": 1500,
-        "tinterstim": 750,
+        "tstim": 1000,
+        "tinterstim": 500,
         "tansweron": 800,
         "tfeedback": 1500
     },
@@ -19,8 +19,8 @@
     },
     "trials": {
         "1": ["B","true"],
-        "2": ["F", "true"],
-        "3": ["HC", "true"],
+        "2": ["HC", "true"],
+        "3": ["F", "true"],
         "4": ["DG", "true"],
         "5": ["A", "false"],
         "6": ["E", "false"],

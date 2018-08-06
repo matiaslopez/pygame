@@ -8,23 +8,28 @@ import Properties
 
 class ImageMessage(pygame.sprite.DirtySprite):
 
-    def __init__(self, name):
+    def __init__(self, name, profile=""):
         pygame.sprite.DirtySprite.__init__(self)
         self.name = name
+        self.profile = profile + ("-" if profile != "" else "")
 
         self.set()
 
     def set(self):
-        self.image = pygame.transform.smoothscale(pygame.image.load("./images/" + self.name).convert_alpha(), Properties.SCREEN_RES)
+        self.image = pygame.transform.smoothscale(
+            pygame.image.load("./images/{}".format(self.profile + self.name)).convert_alpha(),
+                         Properties.SCREEN_RES)
         self.rect = self.image.get_rect()
 
         self.hide()
 
     def hide(self):
+        # print "Hiding ", self.name
         self.visible =  False
         self.dirty = True
 
     def show(self):
+        # print "Showing ", self.name
         self.visible =  True
         self.dirty = True
 
@@ -58,11 +63,15 @@ class ImageButton(ImageMessage):
         self.image = self.image_pressed
         self.dirty = True
 
-    def release_click(self):
+    def un_click(self):
         self.image = self.image_unpressed
         self.dirty = True
-        # print "ImageDone clicked"
         # self.callback()
+
+    def release_click(self):
+        self.un_click()
+        print "Result press " + ("right" if self.side else "left")
+        self.callback(self.side)
 
 
 class Feedback(ImageMessage):

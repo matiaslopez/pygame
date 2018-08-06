@@ -22,7 +22,7 @@ class ExpRunner():
         self.block = block
         self.msgs = msgs
         self.waiting = True
-        print self.msgs
+        # print self.msgs
         self.msgs["welcome"].show()
 
     def next_block(self):
@@ -60,4 +60,5 @@ class ExpRunner():
         self.waiting = False
         self.block.hide()
         for v in self.msgs.itervalues():
+            # print "ExpRunner -> Hiding"
             v.hide()

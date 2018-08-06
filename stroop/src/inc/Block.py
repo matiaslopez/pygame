@@ -44,7 +44,7 @@ class Block():
         self.waiting = True
 
     def to_activeEndTrial(self):
-        self.msgs["background"].show()
+        # self.msgs["background"].show()
         self.activeEndTrial = True
         self.init_time = current_milli_time_block()
 
@@ -69,6 +69,7 @@ class Block():
                         self.properties["tmax"], # TP
                         self.properties["tfeed"],
                         "OPERATOR-" + str(self.block_id),
+                        "TRIAL-" + str(self.idx),
                         self.to_activeEndTrial
                         )
                 self.idx = self.idx + 1
@@ -86,10 +87,10 @@ class Block():
             print ("Estamos en la condicion: FEED")
             if len(self.n2) > self.idx:
                 self.trial.set(self.n2[self.idx], # TS
-                        self.properties["tp"], # TP
-                        self.properties["tam"],
+                        self.properties["tmax"], # TP
                         self.properties["tfeed"],
                         "FEEDBACK-" + str(self.block_id),
+                        "TRIAL-" + str(self.idx),
                         self.to_activeEndTrial)
                 self.idx = self.idx + 1
             else: # INIT_SUBJ
@@ -106,11 +107,12 @@ class Block():
             print ("Estamos en la condicion: SUBJ")
             if len(self.n3) > self.idx:
                 self.trial.set(self.n3[self.idx], # TS
-                        self.properties["tp"], # TP
-                        self.properties["tam"],
+                        self.properties["tmax"], # TP
                         0, # TFEED
                         "SUBJECT-" + str(self.block_id),
-                        self.to_waiting)
+                        "TRIAL-" + str(self.idx),
+                        self.to_activeEndTrial)
+                        # self.to_waiting)
                 self.idx = self.idx + 1
             else:
                 self.state = self.state + 1
@@ -124,11 +126,13 @@ class Block():
         self.waiting = False
         self.trial.hide()
         for v in self.msgs.itervalues():
+            # print "block -> Hiding"
             v.hide()
 
     def tic(self):
         if self.activeEndTrial:
-            if 500 + self.init_time < current_milli_time_block():
+            # if 0 + self.init_time < current_milli_time_block():
+            if 1000 + self.init_time < current_milli_time_block():
                 # print "END state in t= ", current_milli_time_block() - self.init_time
                 self.next()
                 self.activeEndTrial = False

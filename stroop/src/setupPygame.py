@@ -42,10 +42,10 @@ class pygame2exe(py2exe.build_exe.py2exe): #This hack make sure that pygame defa
 class BuildExe:
     def __init__(self):
         #Name of starting .py
-        self.script = "TowerOfLondon.py"
+        self.script = "Stroop.py"
 
         #Name of program
-        self.project_name = "ToL"
+        self.project_name = "Stroop"
 
         #Project url
         self.project_url = "about:none"
@@ -54,10 +54,10 @@ class BuildExe:
         self.project_version = "0.0"
 
         #License of the program
-        self.license = "MyApps License"
+        self.license = "Libre"
 
         #Auhor of program
-        self.author_name = "Me"
+        self.author_name = "ML"
         self.author_email = "example@example.com"
         self.copyright = "Copyright (c) 2009 Me."
 
@@ -68,7 +68,7 @@ class BuildExe:
         self.icon_file = None
 
         #Extra files/dirs copied to game
-        self.extra_datas = ["fonts", "images"]
+        self.extra_datas = ["images"]
 
         #Extra/excludes python modules
         self.extra_modules = []

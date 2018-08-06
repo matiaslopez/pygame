@@ -9,13 +9,15 @@ current_milli_time = lambda: int(round(time.time() * 1000))
 
 
 class Stimulus(pygame.sprite.DirtySprite):
-    def __init__(self, is_conguent=True):
+    def __init__(self, profile="", is_conguent=True):
         pygame.sprite.DirtySprite.__init__(self)
+
+        root_dir = "./images/" + profile + ("-" if profile!= "" else "")
         self.image_cong = pygame.transform.smoothscale(
-                        pygame.image.load("./images/congruent.png").convert_alpha(),
+                        pygame.image.load(root_dir + "congruent.png").convert_alpha(),
                         (Properties.stim_side, Properties.stim_side))
         self.image_incong = pygame.transform.smoothscale(
-                        pygame.image.load("./images/incongruent.png").convert_alpha(),
+                        pygame.image.load(root_dir + "incongruent.png").convert_alpha(),
                         (Properties.stim_side, Properties.stim_side))
 
         self.image = self.image_incong

@@ -24,8 +24,15 @@ from inc.Stimulus import *
 
 INTERACTIVE, PASSIVE, FEEDBACK = [ p for p in range(0,3) ]
 
-# SUBJECT_NAME = raw_input('Nombre: ')
-SUBJECT_NAME = "Q"
+SUBJECT_NAME = raw_input('Nombre: ')
+BACKGROUND_PROFILE = raw_input('Perfil de fondo (1, 2): ')
+STIM_PROFILE = raw_input('Perfil de piezas (1, 2): ')
+
+
+# SUBJECT_NAME = "Q"
+# BACKGROUND_PROFILE = "1"
+# STIM_PROFILE = "2"
+
 
 class Stroop():
 
@@ -42,14 +49,28 @@ class Stroop():
         self.sprites_group = pygame.sprite.LayeredDirty()
 
         # self.background = pygame.sprite.DirtySprite()
-        self.background =  ImageMessage("background.png")
+        self.background =  ImageMessage("background.png", BACKGROUND_PROFILE)
         self.background.show()
         self.sprites_group.add(self.background, layer=BACKGR_lyr)
 
         self.msgs = {}
 
-        self.msgs["welcome"] =  ImageMessage("welcome.png")
-        self.msgs["the_end"] =  ImageMessage("theEnd.png")
+        self.msgs["welcome"] =  ImageMessage("welcome.png", BACKGROUND_PROFILE)
+        self.msgs["the_end"] =  ImageMessage("theEnd.png", BACKGROUND_PROFILE)
+        # self.msgs["background"] =  ImageMessage("background.png")
+        self.msgs["op"] =  ImageMessage("operator.png", BACKGROUND_PROFILE)
+        self.msgs["feed"] =  ImageMessage("feedback.png", BACKGROUND_PROFILE)
+        self.msgs["subj"] =  ImageMessage("subject.png", BACKGROUND_PROFILE)
+        self.msgs["end_block"] =  ImageMessage("endBlock.png", BACKGROUND_PROFILE)
+
+        for v in self.msgs.itervalues():
+            self.sprites_group.add(v, layer=MSG_lyr)
+
+        self.feedback_ok = Feedback()
+        self.feedback_no = Feedback(False)
+        self.sprites_group.add(self.feedback_ok, layer=FEED_lyr)
+        self.sprites_group.add(self.feedback_no, layer=FEED_lyr)
+
 
         # self.state = State.State()
         # st = self.state
@@ -66,13 +87,16 @@ class Stroop():
         self.btns = {}
         self.btns["left"] =  ImageButton(0)
         self.btns["right"] =  ImageButton(1)
-        self.btns["left"].set_callback(lambda: self.exp_runner.check_answer([
-                    c for i in xrange(len(self.palettes)) for c in self.palettes[i].get_selected() ]))
         for v in self.btns.itervalues():
             self.sprites_group.add(v, layer=ANSW_BTN_lyr)
 
+        # self.btns["left"].set_callback(lambda: self.exp_runner.check_answer([
+                    # c for i in xrange(len(self.palettes)) for c in self.palettes[i].get_selected() ]))
+
 
         self.trial = Trial(self.logger, self.change_to_active_mode)
+        self.trial.feedback[1] = self.feedback_ok
+        self.trial.feedback[0] = self.feedback_no
         self.block = Block(self.trial, self.msgs)
 
         # self.exp_runner = ExpRunner(self.experiment_data, self.add_elements, self.add_screenshot)
@@ -80,9 +104,17 @@ class Stroop():
                     self.msgs, self.set_images)
 
         self.exp_runner.end_test = self.end_game
+
+        self.btns["left"].set_callback(self.trial.usr_answer)
+        self.btns["right"].set_callback(self.trial.usr_answer)
+
+
         # self.exp_runner.instruction = self.instruction
         # self.exp_runner.next()
         self.change_to_active_mode(False)
+        # self.msgs["welcome"].show()
+        self.clicked_sprite = None
+
 
 
     def change_to_active_mode(self, toActive=True):
@@ -102,17 +134,15 @@ class Stroop():
         # print "Set images"
         self.sprites_group.empty()
 
-        self.stimulus = Stimulus(3)
-        self.target_img = Stimulus(False)
+        self.stimulus = Stimulus(STIM_PROFILE)
         self.feed = Feedback()
 
+        self.sprites_group.add(self.feedback_ok, layer=FEED_lyr)
+        self.sprites_group.add(self.feedback_no, layer=FEED_lyr)
 
-        # self.msgs["background"] =  ImageMessage("background.png")
-        self.msgs["op"] =  ImageMessage("operator.png")
-        # self.msgs["feed"] =  ImageMessage("feedback.png")
-        # self.msgs["subj"] =  ImageMessage("subject.png")
+
         # self.msgs["wait"] =  ImageMessageBar("endTrial.png", self.feed)
-        # self.msgs["end_block"] =  ImageMessage("endBlock.png")
+
 
         for v in self.msgs.itervalues():
             self.sprites_group.add(v, layer=MSG_lyr)
@@ -122,12 +152,12 @@ class Stroop():
 
         self.sprites_group.add(self.background, layer=BACKGR_lyr)
         self.sprites_group.add(self.stimulus, layer=STIM_lyr)
-        self.sprites_group.add(self.target_img, layer=STIM_lyr)
+        # self.sprites_group.add(self.target_img, layer=STIM_lyr)
         # self.sprites_group.add(self.feed.slow, layer=FEED_lyr)
         # self.sprites_group.add(self.feed.ok, layer=FEED_lyr)
         # self.sprites_group.add(self.feed.quick, layer=FEED_lyr)
 
-        self.trial.set_images(self.stimulus, self.target_img, self.feed)
+        self.trial.set_images(self.stimulus, self.feed)
 
 
 
@@ -194,7 +224,7 @@ class Stroop():
         self.event_handler.suscribe(pygame.QUIT, self.end_game)
 
         # self.event_handler.suscribe(pygame.MOUSEBUTTONDOWN, self.clicked)
-        # self.event_handler.suscribe(pygame.MOUSEMOTION, self.move_mouse)
+        self.event_handler.suscribe(pygame.MOUSEMOTION, self.move_mouse)
         # self.event_handler.suscribe(pygame.MOUSEBUTTONUP, self.unclicked)
         self.event_handler.suscribe(pygame.KEYDOWN, lambda ev: self.keyboard_handler.dispatch(ev.key, ev))
 
@@ -213,21 +243,22 @@ class Stroop():
         (x, y) = pygame.mouse.get_pos()
 
         if self.state == INTERACTIVE:
-            print (x,y, len(self.sprites_group.get_sprites_from_layer(ANSW_BTN_lyr)))
+            # print (x,y, len(self.sprites_group.get_sprites_from_layer(ANSW_BTN_lyr)))
             for i in self.sprites_group.get_sprites_from_layer(ANSW_BTN_lyr):
-                print i.rect.center
                 if (i.rect.collidepoint(x, y)):
+                    self.clicked_sprite = i
                     # print "Click box ", i.box_name
                     i.click()
 
     def release_click(self, res):
         (x, y) = pygame.mouse.get_pos()
 
-        if self.state == INTERACTIVE:
+        if self.state == INTERACTIVE and self.clicked_sprite is not None:
             for i in self.sprites_group.get_sprites_from_layer(ANSW_BTN_lyr):
                 if (i.rect.collidepoint(x, y)):
                     # print "Click button "
                     i.release_click()
+            self.clicked_sprite = None
 
 
     # def clicked(self, res):
@@ -242,9 +273,13 @@ class Stroop():
 
 
 
-    # def move_mouse(self, res):
-    #     if self.clicked_sprite is not None:
-    #         self.clicked_sprite.set_position(pygame.mouse.get_pos())
+    def move_mouse(self, res):
+        (x, y) = pygame.mouse.get_pos()
+        if self.clicked_sprite is not None:
+            if not self.clicked_sprite.rect.collidepoint(x, y):
+                self.clicked_sprite.un_click()
+                self.clicked_sprite = None
+
 
     # def unclicked(self, res):
     #     (x, y) = pygame.mouse.get_pos()
@@ -327,10 +362,9 @@ class Stroop():
         while self.running:
             self.event_handler.handle()
 
-#             dt = self.clock.tick(30)
-            dt = self.clock.tick(60)
-            # self.trial.tic()
-            #self.tweener.update(dt / 1000.0)
+            dt = self.clock.tick(10)
+            self.trial.tic()
+            self.block.tic()
 
             self.sprites_group.draw(self.screen)
             pygame.display.flip()

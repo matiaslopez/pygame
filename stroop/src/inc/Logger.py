@@ -53,16 +53,15 @@ class FileLogger():
 
     #     self.write_down(str_store)
 
-    def log_trial_result(self, trial_id, correct, moves_num,
-                expected_moves, sequence_boards):
+    def log_trial_result(self, block_id, stim_kind, idx_trial, is_correct, time):
         str_store = []
         str_store.append("RESULT")
         str_store.append(str(datetime.datetime.today().strftime("[%Y-%m-%d %H.%M.%S] ")))
-        str_store.append(str(trial_id))
-        str_store.append(str(correct))
-        str_store.append(str(moves_num))
-        str_store.append(str(expected_moves))
-        str_store.append(json.dumps(sequence_boards))
+        str_store.append(str(block_id))
+        str_store.append(str(stim_kind))
+        str_store.append(str(idx_trial))
+        str_store.append(str(is_correct))
+        str_store.append(str(time))
 
         self.write_down(str_store)
 
@@ -78,32 +77,32 @@ class FileLogger():
 
         self.write_down(str_store)
 
-    def log_pick_disk(self, trial_id, source, target, current_board, move_num, picked_disk):
-        str_store = []
-        str_store.append("PICK DISK")
-        str_store.append(str(datetime.datetime.today().strftime("[%Y-%m-%d %H.%M.%S] ")))
-        str_store.append(str(trial_id))
-        str_store.append(str(source))
-        str_store.append(str(target))
-        str_store.append(str(current_board))
-        str_store.append(str(move_num))
-        str_store.append(str(picked_disk))
+    # def log_pick_disk(self, trial_id, source, target, current_board, move_num, picked_disk):
+    #     str_store = []
+    #     str_store.append("PICK DISK")
+    #     str_store.append(str(datetime.datetime.today().strftime("[%Y-%m-%d %H.%M.%S] ")))
+    #     str_store.append(str(trial_id))
+    #     str_store.append(str(source))
+    #     str_store.append(str(target))
+    #     str_store.append(str(current_board))
+    #     str_store.append(str(move_num))
+    #     str_store.append(str(picked_disk))
 
-        self.write_down(str_store)
+    #     self.write_down(str_store)
 
-    def log_release_disk(self, trial_id, source, target, current_board, move_num, released_disk, new_position):
-        str_store = []
-        str_store.append("RELEASE DISK")
-        str_store.append(str(datetime.datetime.today().strftime("[%Y-%m-%d %H.%M.%S] ")))
-        str_store.append(str(trial_id))
-        str_store.append(str(source))
-        str_store.append(str(target))
-        str_store.append(str(current_board))
-        str_store.append(str(move_num))
-        str_store.append(str(released_disk))
-        str_store.append(str(new_position))
+    # def log_release_disk(self, trial_id, source, target, current_board, move_num, released_disk, new_position):
+    #     str_store = []
+    #     str_store.append("RELEASE DISK")
+    #     str_store.append(str(datetime.datetime.today().strftime("[%Y-%m-%d %H.%M.%S] ")))
+    #     str_store.append(str(trial_id))
+    #     str_store.append(str(source))
+    #     str_store.append(str(target))
+    #     str_store.append(str(current_board))
+    #     str_store.append(str(move_num))
+    #     str_store.append(str(released_disk))
+    #     str_store.append(str(new_position))
 
-        self.write_down(str_store)
+    #     self.write_down(str_store)
 
 
     def log_message(self, message):

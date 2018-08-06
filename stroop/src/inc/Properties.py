@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import pygame
 
-SCREEN_RES = (1200, 900)
-# SCREEN_RES = (800, 600)
+# SCREEN_RES = (1200, 900)
+SCREEN_RES = (800, 600)
 
 (x,y) = SCREEN_RES
 

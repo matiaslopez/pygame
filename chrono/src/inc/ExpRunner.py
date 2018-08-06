@@ -5,6 +5,7 @@ import pygame
 import time
 
 import Properties
+import json
 
 INIT_OP, OP, INIT_FEED, FEED, INIT_SUBJ, SUBJ, END = [ p for p in range(7) ]
 

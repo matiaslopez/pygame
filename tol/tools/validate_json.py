@@ -12,7 +12,7 @@ def check(trials):
         csv_reader.next()
         for row in csv_reader:
             # print row
-            src, dst, dist = row
+            src, dst, _, dist = row
             if trial_def.has_key((int(src),int(dst))):
                 print "Error", src, dst, dist
             else:

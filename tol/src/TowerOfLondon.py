@@ -7,7 +7,7 @@ import inc.State as State
 
 import datetime
 import json
-from random import randrange, choice
+import random
 
 from inc.StickSprite import StickSprite
 from inc.DiskSprite import DiskSprite
@@ -29,13 +29,13 @@ import inc.distance
 EXPERIMENT_MODE, FREE_MODE = [ p for p in range(0,2) ]
 INTERACTIVE, PASSIVE, FEEDBACK = [ p for p in range(0,3) ]
 
-SUBJECT_NAME = raw_input('Nombre: ')
-BACKGROUND_PROFILE = raw_input('Perfil de fondo (1, 2, 3 4, 5 o 6): ')
-DISKS_PROFILE = raw_input('Perfil de piezas (1 por defecto): ')
+SUBJECT_NAME = raw_input('Nro. caso: ')
+# BACKGROUND_PROFILE = raw_input('Perfil de fondo (1, 2, 3 4, 5 o 6): ')
+# DISKS_PROFILE = raw_input('Perfil de piezas (1 por defecto): ')
 
 # SUBJECT_NAME = "Q"
-# BACKGROUND_PROFILE = 2
-# DISKS_PROFILE = 2
+BACKGROUND_PROFILE = 6
+DISKS_PROFILE = 1
 
 class FileLogger():
 
@@ -46,9 +46,9 @@ class FileLogger():
             os.makedirs(directory)
 
         d = datetime.datetime.today().strftime("%Y-%m-%d_%H.%M.%S")
-        file_name = (SUBJECT_NAME + "_" +
-                     "BACK_" + str(BACKGROUND_PROFILE) + "_" +
-                     "DISK_" + str(DISKS_PROFILE) + "_" +
+        file_name = ("TOL_" + SUBJECT_NAME + "_" +
+                     # "BACK_" + str(BACKGROUND_PROFILE) + "_" +
+                     # "DISK_" + str(DISKS_PROFILE) + "_" +
                     d + ".csv")
         file_path = os.path.join(directory, file_name)
 
@@ -72,6 +72,9 @@ class FileLogger():
         str_store = ["TRIAL START","Date","trial_id","sequence", "Feedback"]
         self.write_down(str_store)
 
+        str_store = ["RAW_DATA","Date","name","value"]
+        self.write_down(str_store)
+
 
     # def log_click(self, trial_id, box_clicked_num, click_num, box_name, expected_box_name, time, correct, x, y):
     #     str_store = []
@@ -88,6 +91,15 @@ class FileLogger():
     #     str_store.append(str(y))
 
     #     self.write_down(str_store)
+
+    def log_raw(self, name, raw_data):
+        str_store = []
+        str_store.append("RAW_DATA")
+        str_store.append(str(datetime.datetime.today().strftime("[%Y-%m-%d %H.%M.%S] ")))
+        str_store.append(name)
+        str_store.append(json.dumps(raw_data))
+
+        self.write_down(str_store)
 
     def log_trial_result(self, trial_id, correct, moves_num,
                 expected_moves, sequence_boards):
@@ -163,6 +175,8 @@ class TowerOfLondon():
 
     def __init__(self, experiment):
         self.logger = FileLogger()
+        self.logger.log_raw("experiment", experiment)
+        self.logger.log_raw("user_id", SUBJECT_NAME)
         self.experiment = experiment
         self.mode = EXPERIMENT_MODE
 
@@ -284,13 +298,13 @@ class TowerOfLondon():
 
     def set_board_distance(self, distance=None):
         if distance is None:
-            distance = randrange(8)+1
+            distance = random.randrange(8)+1
 
-        l1 = randrange(len(inc.distance.dist))
+        l1 = random.randrange(len(inc.distance.dist))
 
         indexes = [i for i, x in enumerate(inc.distance.dist[l1]) if x == distance]
 
-        l2 = choice(indexes)
+        l2 = random.choice(indexes)
         self.set_board(l1)
         self.set_goal(l2)
 
@@ -442,12 +456,38 @@ class TowerOfLondon():
 
         # pygame.image.save(pygame.display.get_surface(), "screenshot.png")
 
+def load_chuncks():
+    json_data=open("chunks.json")
+    return json.load(json_data)
+
+def get_trials_to_id(id_user):
+    res = {}
+    res['trials'] = {}
+    res['trials']["1"] = [17, 28, "true", 1]
+    res['trials']["2"] = [ 5, 27, "true", 2]
+    res['trials']["3"] = [ 0, 15, "true", 1]
+    res['trials']["4"] = [14, 34, "true", 2]
+    res['trials']["5"] = [25, 35, "false", 1]
+    res['trials']["6"] = [10, 29, "false", 2]
+
+    trials = load_chuncks()
+    trial_count = 7
+    for k in sorted(trials.keys()):
+        idx = id_user % len(trials[k])
+        # print k ,"-> block", idx
+        q = trials[k][idx]
+        random.shuffle(q)
+        for v in q:
+            res['trials'][str(trial_count)] = [v[0], v[1], "false", v[2]]
+            trial_count += 1
+    return res
+
 def main():
     pygame.init()
     pygame.display.set_mode(Properties.SCREEN_RES)
-    json_data=open("input.json").read()
-    experiment = json.loads(json_data)
-
+    # json_data=open("input.json").read()
+    # experiment = json.loads(json_data)
+    experiment = get_trials_to_id(int(SUBJECT_NAME))
 
     game = TowerOfLondon(experiment)
     game.run()

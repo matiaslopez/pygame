@@ -34,8 +34,8 @@ SUBJECT_NAME = raw_input('Nro. caso: ')
 # DISKS_PROFILE = raw_input('Perfil de piezas (1 por defecto): ')
 
 # SUBJECT_NAME = "Q"
-BACKGROUND_PROFILE = 6
-DISKS_PROFILE = 1
+BACKGROUND_PROFILE = 7
+DISKS_PROFILE = 5
 
 class FileLogger():
 
@@ -379,7 +379,9 @@ class TowerOfLondon():
     def unclicked(self, res):
         already_placed = False
         # import pdb; pdb.set_trace()
+        was_holding = False
         if self.clicked_sprite is not None:
+            was_holding = True
             qq = self.clicked_sprite
             for i in self.sprites_group.get_sprites_from_layer(STICK_lyr):
                 if (i.rect.colliderect(self.clicked_sprite)):
@@ -419,7 +421,7 @@ class TowerOfLondon():
         if self.moving_state == INTERACTIVE:
             (x, y) = pygame.mouse.get_pos()
             for i in self.sprites_group.get_sprites_from_layer(CTRL_BTN_lyr):
-                if (i.rect.collidepoint(x, y)):
+                if (i.rect.collidepoint(x, y)) and not was_holding:
                     i.release_click()
         elif self.moving_state == PASSIVE:
             self.show_messages()

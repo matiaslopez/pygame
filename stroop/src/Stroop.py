@@ -11,7 +11,7 @@ import json
 from random import randrange, choice
 
 from inc.ImageMessage import *
-from inc.Diagram import *
+#from inc.Diagram import *
 from inc.ExpRunner import *
 from inc.Trial import *
 from inc.Block import *

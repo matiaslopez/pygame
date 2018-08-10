@@ -28,9 +28,9 @@ class Profile():
 PROFILE = Profile()
 
 img_done_pos = (int(x*11.0/12), int(y * 7.0/10))
-img_done_side = int(x*1.0/10)
+img_done_side = int(x*1.0/7)
 
-stim_side = int(min(x*1.0/6, y*1.0/5))
+stim_side = int(min(x*1.0/5, y*1.0/4))
 stim_position = {0: (int(x*2.0/8), y/2),
                  1: (int(x*6.0/8), y/2)}
 

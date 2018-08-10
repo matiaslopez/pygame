@@ -37,7 +37,7 @@ class Trial():
         self.feed = feed
 
     def set(self, stim_kind, tmax, tfeed, block_id, idx_trial, handle_end = None):
-        print (tmax, tfeed, block_id, handle_end)
+        # print (tmax, tfeed, block_id, handle_end)
         self.state = INIT
         self.stim_kind = stim_kind
         self.tmax = tmax
@@ -56,10 +56,10 @@ class Trial():
         else:
             is_correct = ans_value != stimulus_reference[self.stim_kind][1]
 
-        print "Receiving answer", ans_value, " - Is correct? ", is_correct
+        # print "Receiving answer", ans_value, " - Is correct? ", is_correct
 
         delta = current_milli_time() - self.init_time
-        print delta
+        # print delta
         self.logger.log_trial_result(self.block_id,
                                      self.stim_kind,
                                      self.idx_trial,
@@ -91,7 +91,7 @@ class Trial():
                                    stimulus_reference[self.stim_kind][1])
             self.stim.show()
             self.change_to_active_mode(True)
-            print "Show STIM", self.state_duration
+            # print "Show STIM", self.state_duration
             self.percent_answer = None
         elif self.state == ANSWERED:
             self.running = True
@@ -101,7 +101,7 @@ class Trial():
             # if self.percent_answer is None: # Loggin No Answer
                 # self.logger.log_answer(self.block_id, self.ts, "NA")
             # self.feed.set(self.percent_answer)
-            print "Show ANSWERED", self.result
+            # print "Show ANSWERED", self.result
         # elif self.state == TP2:
         #     self.running = True
         #     self.state_duration = self.tfeed

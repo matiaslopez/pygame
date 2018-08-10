@@ -52,7 +52,7 @@ class Block():
         self.hide()
 
         if self.state == INIT_OP:
-            print ("Estamos en la condicion: INIT_OP")
+            # print ("Estamos en la condicion: INIT_OP")
             self.waiting = True
             self.msgs["op"].show()
             self.state = self.state + 1
@@ -62,7 +62,7 @@ class Block():
             # self.to_activeEndTrial()
             # self.state = self.state + 1
         elif self.state == OP:
-            print ("Estamos en la condicion: OP")
+            # print ("Estamos en la condicion: OP")
             # if len(self.n1) > self.idx:
             if len(self.n1) > self.idx:
                 self.trial.set(self.n1[self.idx], # TS
@@ -80,11 +80,11 @@ class Block():
                 self.idx = 0
                 # print "Show INIT_FEED msj"
         elif self.state == ACTIVE_STOP_2:
-            print ("Estamos en la condicion: ACTIVE_STOP_2")
+            # print ("Estamos en la condicion: ACTIVE_STOP_2")
             self.to_activeEndTrial()
             self.state = self.state + 1
         elif self.state == FEED:
-            print ("Estamos en la condicion: FEED")
+            # print ("Estamos en la condicion: FEED")
             if len(self.n2) > self.idx:
                 self.trial.set(self.n2[self.idx], # TS
                         self.properties["tmax"], # TP
@@ -100,11 +100,11 @@ class Block():
                 self.idx = 0
                 # print "Show INIT_SUBJ msj"
         elif self.state == ACTIVE_STOP_3:
-            print ("Estamos en la condicion: ACTIVE_STOP_3")
+            # print ("Estamos en la condicion: ACTIVE_STOP_3")
             self.to_activeEndTrial()
             self.state = self.state + 1
         elif self.state == SUBJ:
-            print ("Estamos en la condicion: SUBJ")
+            # print ("Estamos en la condicion: SUBJ")
             if len(self.n3) > self.idx:
                 self.trial.set(self.n3[self.idx], # TS
                         self.properties["tmax"], # TP

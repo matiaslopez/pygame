@@ -59,7 +59,7 @@ class ImageButton(ImageMessage):
         self.callback = callback
 
     def click(self):
-        print "ImageDone clicked"
+        # print "ImageDone clicked"
         self.image = self.image_pressed
         self.dirty = True
 
@@ -70,7 +70,7 @@ class ImageButton(ImageMessage):
 
     def release_click(self):
         self.un_click()
-        print "Result press " + ("right" if self.side else "left")
+        # print "Result press " + ("right" if self.side else "left")
         self.callback(self.side)
 
 

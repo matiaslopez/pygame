@@ -33,16 +33,16 @@ class ExpRunner():
         self.waiting = True
 
     def prev(self):
-        print "PREV", self.state, PASSIVE
+        # print "PREV", self.state, PASSIVE
         if self.state == PASSIVE:
             if self.exp_struct.has_key(str(self.current_trial-1)):
-                print "Previous exists"
+                # print "Previous exists"
                 is_playable = json.loads(self.exp_struct[str(self.current_trial-1)][0])
                 if not is_playable:
                     self.current_trial = self.current_trial - 1
                     # t = str(self.current_trial)
                     self.set()
-                    print "GOING BACK",
+                    # print "GOING BACK",
 
     def next(self):
         self.current_block = self.current_block + 1

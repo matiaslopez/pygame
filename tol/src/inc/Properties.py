@@ -35,7 +35,7 @@ stick_pos = [ (qq, y - floor_height) for qq in sticks_y_pos]
 
 # GOAL
 goal_pos = (0.05* x, 0.05* y)
-goal_scale = 0.2
+goal_scale = 0.3
 goal_disk_rect = (int(disk_width*goal_scale), int(disk_height*goal_scale))
 goal_stick_rect = [ pygame.Rect(0, 0, int(stick_width*goal_scale), int(((disk_height+5)*qq+15)*goal_scale)) for qq in [1,2,3]]
 goal_stick_pos = [ (int((qq- stick_width/2) * goal_scale),

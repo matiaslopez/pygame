@@ -37,7 +37,7 @@ STIM_PROFILE = raw_input('Perfil de piezas (1, 2): ')
 class Stroop():
 
     def __init__(self, experiment_data):
-        self.logger = FileLogger(SUBJECT_NAME)
+        self.logger = FileLogger(SUBJECT_NAME, BACKGROUND_PROFILE, STIM_PROFILE)
         self.experiment_data = experiment_data
 
         self.screen = pygame.display.get_surface()

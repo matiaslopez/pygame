@@ -3,7 +3,7 @@ import datetime
 
 class FileLogger():
 
-    def __init__(self, SUBJECT_NAME):
+    def __init__(self, SUBJECT_NAME, BACKGROUND_PROFILE, STIM_PROFILE):
         import os
         directory = os.path.join(os.getcwd(), 'logs')
         if not os.path.exists(directory):
@@ -11,10 +11,14 @@ class FileLogger():
 
         d = datetime.datetime.today().strftime("%Y-%m-%d_%H.%M.%S")
         file_name = (SUBJECT_NAME + "_" +
-                     # "BACK_" + str(BACKGROUND_PROFILE) + "_" +
-                     # "DISK_" + str(DISKS_PROFILE) + "_" +
+                     "BACK_" + str(BACKGROUND_PROFILE) + "_" +
+                     "STIM_" + str(STIM_PROFILE) + "_" +
                     d + ".csv")
         file_path = os.path.join(directory, file_name)
+
+        self.SUBJECT_NAME = SUBJECT_NAME
+        self.BACKGROUND_PROFILE = BACKGROUND_PROFILE
+        self.STIM_PROFILE = STIM_PROFILE
 
         self.f = open(file_path, 'w')
 
@@ -35,6 +39,13 @@ class FileLogger():
 
         str_store = ["TRIAL START","Date","trial_id","sequence", "Feedback"]
         self.write_down(str_store)
+
+        str_store = ["DETAILS","Date","BACKGROUND_PROFILE","STIM_PROFILE"]
+        self.write_down(str_store)
+        d = datetime.datetime.today().strftime("%Y-%m-%d_%H.%M.%S")
+        str_store = ["DETAILS", d, self.BACKGROUND_PROFILE, self.STIM_PROFILE]
+        self.write_down(str_store)
+
 
 
     # def log_click(self, trial_id, box_clicked_num, click_num, box_name, expected_box_name, time, correct, x, y):

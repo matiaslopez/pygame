@@ -42,6 +42,7 @@ class ImageDone(ImageMessage):
         self.image_pressed = pygame.transform.smoothscale(self.image_pressed, (SIDE,SIDE))
 
         self.image = self.image_unpressed
+        self.rect = self.image.get_rect()
 
         self.rect.center = Properties.img_done_pos
         # self.rect.center = (7.5 * (self.image.get_width() * 1.25), 6 * (self.image.get_height()* 1.25))
@@ -54,9 +55,13 @@ class ImageDone(ImageMessage):
         self.image = self.image_pressed
         self.dirty = True
 
-    def release_click(self):
+    def unclick(self):
+        # print "ImageDone clicked"
         self.image = self.image_unpressed
         self.dirty = True
+
+    def release_click(self):
+        self.unclick()
         # print "ImageDone clicked"
         self.callback()
 

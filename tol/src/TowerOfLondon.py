@@ -213,11 +213,16 @@ class TowerOfLondon():
         self.state = State.State()
         st = self.state
 
+        self.experiment_statistics = {"played": {1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0},
+                                      "won": {1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0}}
+
         self.trial = Trial(self.logger, self.show_messages,
                 None,
                 {"ok": self.feedback_ok.show, "no": self.feedback_no.show,
                 "off": (lambda: [self.feedback_ok.hide(), self.feedback_no.hide()])},
                 self)
+
+        self.trial.experiment_statistics = self.experiment_statistics
 
         self.sprites_group.add(StickSprite(st.sticks[1]), layer=STICK_lyr)
         self.sprites_group.add(StickSprite(st.sticks[2]), layer=STICK_lyr)
@@ -235,6 +240,9 @@ class TowerOfLondon():
         self.instruction =  Instruction()
         self.instruction.hide()
         self.sprites_group.add(self.instruction, layer=INST_lyr)
+        self.statistics =  Statistics(self.experiment_statistics)
+        self.statistics.hide()
+        self.sprites_group.add(self.statistics, layer=INST_lyr)
 
         self.msgs = {}
         self.msgs["done"] =  ImageDone()
@@ -246,6 +254,7 @@ class TowerOfLondon():
             self.trial)
         self.exp_runner.end_test = self.end_game
         self.exp_runner.instruction = self.instruction
+        self.exp_runner.statistics = self.statistics
         self.exp_runner.next()
 
 
@@ -287,14 +296,22 @@ class TowerOfLondon():
     def set_events(self):
         suscribir_tecla = self.keyboard_handler.suscribe
 
-        self.event_handler.suscribe(pygame.QUIT, self.end_game)
+        self.event_handler.suscribe(pygame.QUIT, self.exit_game)
 
         self.event_handler.suscribe(pygame.MOUSEBUTTONDOWN, self.clicked)
         self.event_handler.suscribe(pygame.MOUSEMOTION, self.move_mouse)
         self.event_handler.suscribe(pygame.MOUSEBUTTONUP, self.unclicked)
         self.event_handler.suscribe(pygame.KEYDOWN, lambda ev: self.keyboard_handler.dispatch(ev.key, ev))
 
-        suscribir_tecla(pygame.K_ESCAPE, self.end_game)
+        suscribir_tecla(pygame.K_ESCAPE, self.exit_game)
+
+    def unset_events(self):
+        self.event_handler.unsuscribe(pygame.MOUSEBUTTONDOWN, self.clicked)
+        self.event_handler.unsuscribe(pygame.MOUSEMOTION, self.move_mouse)
+        self.event_handler.unsuscribe(pygame.MOUSEBUTTONUP, self.unclicked)
+        # self.event_handler.unsuscribe(pygame.KEYDOWN, lambda ev: self.keyboard_handler.dispatch(ev.key, ev))
+
+        # suscribir_tecla(pygame.K_ESCAPE, self.end_game)
 
     def set_board_distance(self, distance=None):
         if distance is None:
@@ -423,6 +440,8 @@ class TowerOfLondon():
             for i in self.sprites_group.get_sprites_from_layer(CTRL_BTN_lyr):
                 if (i.rect.collidepoint(x, y)) and not was_holding:
                     i.release_click()
+                else:
+                    i.unclick()
         elif self.moving_state == PASSIVE:
             self.show_messages()
         elif self.moving_state == FEEDBACK:
@@ -436,6 +455,11 @@ class TowerOfLondon():
         self.mainLoop()
 
     def end_game(self, ev=None):
+        self.unset_events()
+        self.statistics.set_stats()
+        # self.running = False
+
+    def exit_game(self, ev=None):
         self.logger.log_message("end game")
         self.logger.close()
         self.running = False

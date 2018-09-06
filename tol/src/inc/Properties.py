@@ -47,4 +47,4 @@ goal_disk_pos = {
       }
 
 # BUTTONS
-img_done_pos = (1.05* x, 0.32 * y)
+img_done_pos = (0.9* x, 0.15 * y)

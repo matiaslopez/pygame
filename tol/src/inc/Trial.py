@@ -59,6 +59,9 @@ class Trial():
         else:
             correct = False
 
+        self.experiment_statistics["played"][self.current_trial["expected_moves"]] += 1
+        self.experiment_statistics["won"][self.current_trial["expected_moves"]] += correct
+
         self.logger.log_trial_result(self.trial_name,
                 correct,
                 self.tol.moves_num,

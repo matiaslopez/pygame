@@ -285,6 +285,7 @@ class TowerOfLondon():
             if info_or_feedback==2:
                 self.moving_state = PASSIVE
                 self.instruction.show()
+                # self.statistics.set_stats()
             else:
                 self.moving_state = FEEDBACK
                 if info_or_feedback==1:
@@ -456,6 +457,7 @@ class TowerOfLondon():
 
     def end_game(self, ev=None):
         self.unset_events()
+        self.instruction.hide()
         self.statistics.set_stats()
         # self.running = False
 

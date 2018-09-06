@@ -63,56 +63,61 @@ class Statistics(pygame.sprite.DirtySprite):
         self.callback = None
 
     def set_stats(self):
-        self.image.fill((30,170,70,250))
+        self.image.fill((64,170,116,250))
 
 
-        x = self.rect.centerx
-        y = self.rect.y + 20
+        x = self.rect.width/2
+        y = 20
 
         played = sum([k for k in self.stats["played"].itervalues()])
         stats_by_num = {k: (v, self.stats["won"][k], None if v==0 else self.stats["won"][k]*100/v) for k,v in self.stats["played"].iteritems()}
 
         # print played, stats_by_num
 
-        t = self.font2.render("JUGASTE {} ENSAYOS SELECCIONADOS AL AZAR".format(played), True, (0,0,0))
+        t = self.font2.render("JUGASTE {} ENSAYOS SELECCIONADOS AL AZAR".format(played), True, (240,240,240))
         self.image.blit(t, (x-(t.get_width()/2), y))
         # self.image.blit(t, (x, y))
         y += t.get_height() * 1.8
 
-        t = self.font2.render(u"NUESTRA HIPÓTESIS ES QUE:", True, (0,0,0))
+        t = self.font2.render(u"NUESTRA HIPÓTESIS ES QUE:", True, (240,240,240))
         self.image.blit(t, (x-(t.get_width()/2), y))
         y += t.get_height() * 1.2
-        t = self.font.render(u"CUANTOS MÁS MOVIMIENTOS REQUIERE UN ENSAYO,", True, (0,0,0))
+        t = self.font.render(u"CUANTOS MÁS MOVIMIENTOS REQUIERE UN ENSAYO,", True, (240,240,240))
         self.image.blit(t, (x-(t.get_width()/2), y))
-        y += t.get_height() * 1.2
-        t = self.font.render(u"MÁS DIFÍCIL ES PLANIFICAR CORRECTAMENTE", True, (0,0,0))
+        y += t.get_height() * 1.0
+        t = self.font.render(u"MÁS DIFÍCIL ES PLANIFICAR CORRECTAMENTE", True, (240,240,240))
         self.image.blit(t, (x-(t.get_width()/2), y))
         y += t.get_height() * 2
 
 
-        t = self.font2.render(u"VOS LOGRASTE UN PLAN ÓPTIMO EN LA SIGUIENTE CANTIDAD DE ENSAYOS:", True, (0,0,0))
+        t = self.font2.render(u"VOS LOGRASTE UN PLAN ÓPTIMO EN LA SIGUIENTE CANTIDAD DE ENSAYOS:", True, (240,240,240))
         self.image.blit(t, (x-(t.get_width()/2), y))
         y += t.get_height() * 1.5
 
         for k in range(3,6+1):
             if stats_by_num[k][2] is not None:
-                t = self.font2.render(u"{} MOVIMIENTOS: {}%".format(k, stats_by_num[k][2]), True, (0,0,0))
+                t = self.font2.render(u"{} MOVIMIENTOS: {}%".format(k, stats_by_num[k][2]), True, (240,240,240))
                 self.image.blit(t, (x-(t.get_width()/2), y))
                 y += t.get_height() * 1.1
 
         y += t.get_height() * 1.1
 
+        t = self.font.render(u"ACABAS DE APORTAR EVIDENCIA", True, (240,240,240))
+        self.image.blit(t, (x-(t.get_width()/2), y))
+        y += t.get_height() * 1.0
+
+
         if (stats_by_num[3][2] >= stats_by_num[4][2] and
             stats_by_num[4][2] >= stats_by_num[5][2] and
             stats_by_num[5][2] >= stats_by_num[6][2]):
-            t = self.font.render(u"ACABAS DE APORTAR EVIDENCIA PARA SOSTENER ESTA HIPÓTESIS", True, (0,0,0))
+            t = self.font.render(u"PARA SOSTENER ESTA HIPÓTESIS", True, (240,240,240))
         else:
-            t = self.font.render(u"ACABAS DE APORTAR EVIDENCIA PARA RECHAZAR ESTA HIPÓTESIS", True, (0,0,0))
+            t = self.font.render(u"PARA RECHAZAR ESTA HIPÓTESIS", True, (240,240,240))
 
         self.image.blit(t, (x-(t.get_width()/2), y))
         y += t.get_height() * 1.2
 
-        t = self.font3.render(u"(NO COMENTES LA HIPÓTESIS CON FUTUROS PARTICIPANTES PARA NO INFLUENCIARLOS)", True, (0,0,0))
+        t = self.font3.render(u"(NO COMENTES LA HIPÓTESIS CON FUTUROS PARTICIPANTES PARA NO INFLUENCIARLOS)", True, (240,240,240))
         self.image.blit(t, (x-(t.get_width()/2), y))
         y += t.get_height() * 1.2
 

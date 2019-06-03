@@ -2,16 +2,15 @@
 #!/usr/bin/python
 
 import pygame
-import Properties
 
 
 
 class ImageMessage(pygame.sprite.DirtySprite):
 
-    def __init__(self, name):
+    def __init__(self, name, prop=None):
         pygame.sprite.DirtySprite.__init__(self)
         self.name = name
-
+        self.prop = prop
         self.set()
 
     def set(self):
@@ -29,8 +28,9 @@ class ImageMessage(pygame.sprite.DirtySprite):
         self.dirty = True
 
 class ImageDone(ImageMessage):
-    def __init__(self):
-        ImageMessage.__init__(self, "check-unpressed.png")
+    def __init__(self, prop=None):
+        self.prop = prop
+        ImageMessage.__init__(self, "check-unpressed.png", prop=self.prop)
         SIDE = pygame.display.get_surface().get_rect().width
         SIDE = pygame.display.get_surface().get_rect().height/6
 
@@ -43,7 +43,7 @@ class ImageDone(ImageMessage):
 
         self.image = self.image_unpressed
 
-        self.rect.center = Properties.img_done_pos
+        self.rect.center = self.prop.img_done_pos
         # self.rect.center = (7.5 * (self.image.get_width() * 1.25), 6 * (self.image.get_height()* 1.25))
 
     def set_callback(self, callback):

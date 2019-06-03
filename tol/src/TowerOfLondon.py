@@ -29,13 +29,13 @@ import inc.distance
 EXPERIMENT_MODE, FREE_MODE = [ p for p in range(0,2) ]
 INTERACTIVE, PASSIVE, FEEDBACK = [ p for p in range(0,3) ]
 
-SUBJECT_NAME = raw_input('Nombre: ')
-BACKGROUND_PROFILE = raw_input('Perfil de fondo (1, 2, 3 4, 5 o 6): ')
-DISKS_PROFILE = raw_input('Perfil de piezas (1 por defecto): ')
+# SUBJECT_NAME = raw_input('Nombre: ')
+# BACKGROUND_PROFILE = raw_input('Perfil de fondo (1, 2, 3 4, 5 o 6): ')
+# DISKS_PROFILE = raw_input('Perfil de piezas (1 por defecto): ')
 
-# SUBJECT_NAME = "Q"
-# BACKGROUND_PROFILE = 2
-# DISKS_PROFILE = 2
+SUBJECT_NAME = "Q"
+BACKGROUND_PROFILE = 1
+DISKS_PROFILE = 1
 
 class FileLogger():
 
@@ -166,6 +166,10 @@ class TowerOfLondon():
         self.experiment = experiment
         self.mode = EXPERIMENT_MODE
 
+        SCREEN_RES = (int(experiment["screen_res"]["x"]), int(experiment["screen_res"]["y"]))
+        self.properties = Properties.Properties(SCREEN_RES)
+
+
         self.screen = pygame.display.get_surface()
         self.clock = pygame.time.Clock()
 
@@ -184,10 +188,10 @@ class TowerOfLondon():
         self.sprites_group.add(self.background, layer=BACKGR_lyr)
 
         self.floor = pygame.sprite.DirtySprite()
-        self.floor.image = pygame.surface.Surface((Properties.SCREEN_RES[0], Properties.floor_height))
+        self.floor.image = pygame.surface.Surface((self.properties.SCREEN_RES[0], self.properties.floor_height))
         self.floor.image.fill([0,200,0])
         self.floor.rect = self.floor.image.get_rect()
-        self.floor.rect.bottom = Properties.SCREEN_RES[1]
+        self.floor.rect.bottom = self.properties.SCREEN_RES[1]
         self.sprites_group.add(self.floor, layer=FLOOR_lyr)
 
 
@@ -205,25 +209,25 @@ class TowerOfLondon():
                 "off": (lambda: [self.feedback_ok.hide(), self.feedback_no.hide()])},
                 self)
 
-        self.sprites_group.add(StickSprite(st.sticks[1]), layer=STICK_lyr)
-        self.sprites_group.add(StickSprite(st.sticks[2]), layer=STICK_lyr)
-        self.sprites_group.add(StickSprite(st.sticks[3]), layer=STICK_lyr)
+        self.sprites_group.add(StickSprite(st.sticks[1], self.properties), layer=STICK_lyr)
+        self.sprites_group.add(StickSprite(st.sticks[2], self.properties), layer=STICK_lyr)
+        self.sprites_group.add(StickSprite(st.sticks[3], self.properties), layer=STICK_lyr)
 
 
-        self.sprites_group.add(DiskSprite(st.get_disk(State.B),st.get_disk_position(State.B), mode=DISKS_PROFILE), layer=DISKS_lyr)
-        self.sprites_group.add(DiskSprite(st.get_disk(State.G),st.get_disk_position(State.G), mode=DISKS_PROFILE), layer=DISKS_lyr)
-        self.sprites_group.add(DiskSprite(st.get_disk(State.R),st.get_disk_position(State.R), mode=DISKS_PROFILE), layer=DISKS_lyr)
+        self.sprites_group.add(DiskSprite(st.get_disk(State.B),st.get_disk_position(State.B), mode=DISKS_PROFILE, prop=self.properties), layer=DISKS_lyr)
+        self.sprites_group.add(DiskSprite(st.get_disk(State.G),st.get_disk_position(State.G), mode=DISKS_PROFILE, prop=self.properties), layer=DISKS_lyr)
+        self.sprites_group.add(DiskSprite(st.get_disk(State.R),st.get_disk_position(State.R), mode=DISKS_PROFILE, prop=self.properties), layer=DISKS_lyr)
 
-        self.goal = Goal(DISKS_PROFILE)
+        self.goal = Goal(DISKS_PROFILE, prop=self.properties)
         self.sprites_group.add(self.goal, layer=GOAL_lyr)
 
 
-        self.instruction =  Instruction()
+        self.instruction =  Instruction(prop=self.properties)
         self.instruction.hide()
         self.sprites_group.add(self.instruction, layer=INST_lyr)
 
         self.msgs = {}
-        self.msgs["done"] =  ImageDone()
+        self.msgs["done"] =  ImageDone(prop=self.properties)
         self.msgs["done"].set_callback(self.trial.check_answer)
         for v in self.msgs.itervalues():
             self.sprites_group.add(v, layer=CTRL_BTN_lyr)
@@ -443,10 +447,12 @@ class TowerOfLondon():
         # pygame.image.save(pygame.display.get_surface(), "screenshot.png")
 
 def main():
-    pygame.init()
-    pygame.display.set_mode(Properties.SCREEN_RES)
     json_data=open("input.json").read()
     experiment = json.loads(json_data)
+    SCREEN_RES = (int(experiment["screen_res"]["x"]), int(experiment["screen_res"]["y"]))
+
+    pygame.init()
+    pygame.display.set_mode(SCREEN_RES)
 
 
     game = TowerOfLondon(experiment)

@@ -1,20 +1,21 @@
 # -*- coding: utf-8 -*-
 
 import pygame
-import Properties
 
 class Instruction(pygame.sprite.DirtySprite):
 
-    def __init__(self, moves=2, trial=2):
+    def __init__(self, moves=2, trial=2, prop=None):
         super(Instruction, self).__init__()
 
-        w, h = Properties.SCREEN_RES
+        self.prop = prop
+        w, h = self.prop.SCREEN_RES
         self.image = pygame.Surface((4*w/8,3*h/8), pygame.SRCALPHA)
         self.font = pygame.font.Font('fonts/Oswald-Bold.ttf', 34)
         self.font2 = pygame.font.Font('fonts/Oswald-Bold.ttf', 18)
 
         self.set_num(moves, trial)
         self.callback = None
+
 
     def set_num(self, moves, trial, callback=None):
         self.callback = callback

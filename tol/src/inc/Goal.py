@@ -2,15 +2,15 @@
 #!/usr/bin/python
 
 import pygame
-import Properties
 import State
 
 
 class Goal(pygame.sprite.DirtySprite):
 
-    def __init__(self, mode=3):
+    def __init__(self, mode=3, prop=None):
         pygame.sprite.DirtySprite.__init__(self)
         self.mode = mode
+        self.prop = prop
         self.set(0)
 
     def set(self, board_num):
@@ -18,33 +18,33 @@ class Goal(pygame.sprite.DirtySprite):
         board.set_board_number(board_num)
 
         self.image = pygame.surface.Surface((
-                                            int(Properties.SCREEN_RES[0] * Properties.goal_scale),
-                                            int(Properties.SCREEN_RES[1] * Properties.goal_scale)))
+                                            int(self.prop.SCREEN_RES[0] * self.prop.goal_scale),
+                                            int(self.prop.SCREEN_RES[1] * self.prop.goal_scale)))
 
         self.image.fill([255,255,255])
 
         floor = pygame.surface.Surface((
-                                            int(Properties.SCREEN_RES[0] * Properties.goal_scale),
-                                            int(Properties.floor_height * Properties.goal_scale)))
+                                            int(self.prop.SCREEN_RES[0] * self.prop.goal_scale),
+                                            int(self.prop.floor_height * self.prop.goal_scale)))
         floor.fill([0,200,0])
         self.image.blit(floor, (0, self.image.get_height()-floor.get_height()))
 
 
         self.rect = self.image.get_rect()
-        self.rect.topleft = Properties.goal_pos #(Properties.SCREEN_RES[0]-30,30)
+        self.rect.topleft = self.prop.goal_pos #(self.prop.SCREEN_RES[0]-30,30)
 
 
         for num in xrange(0,3):
-            stick = pygame.Surface(Properties.goal_stick_rect[num].size)
-            stick.fill(Properties.stick_color)
-            self.image.blit(stick, Properties.goal_stick_pos[num])
+            stick = pygame.Surface(self.prop.goal_stick_rect[num].size)
+            stick.fill(self.prop.stick_color)
+            self.image.blit(stick, self.prop.goal_stick_pos[num])
 
         (x,y) = self.rect.size
         for num in xrange(1,3+1):
             stim = pygame.transform.scale(pygame.image.load("images/mode_%s_disk_%s.png" %(self.mode, num, )),
-                Properties.goal_disk_rect)
+                self.prop.goal_disk_rect)
             (stick,pos) = board.get_disk_position(num)
-            (stick,pos) = Properties.goal_disk_pos["x"][stick-1],Properties.goal_disk_pos["y"][pos-1],
+            (stick,pos) = self.prop.goal_disk_pos["x"][stick-1],self.prop.goal_disk_pos["y"][pos-1],
             self.image.blit(stim, (stick,pos))
 
 

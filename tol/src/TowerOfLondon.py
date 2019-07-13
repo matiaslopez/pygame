@@ -180,6 +180,7 @@ class TowerOfLondon():
 
         # self.background = pygame.sprite.DirtySprite()
         self.background =  ImageMessage("scale_fondo{}.png".format(BACKGROUND_PROFILE))
+        self.background.scale(SCREEN_RES[0], SCREEN_RES[1])
         self.background.show()
 
         # self.background.image = pygame.surface.Surface(Properties.SCREEN_RES)

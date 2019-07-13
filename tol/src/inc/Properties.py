@@ -31,7 +31,7 @@ class Properties():
     # STICKS
     (self.stick_width, self.stick_height) = (30, self.disk_height)
     self.stick_color = (255,127,0)
-    self.sticks_y_pos = [200, 400, 600]
+    self.sticks_y_pos = [int(SCREEN_RES[0]*1/4), int(SCREEN_RES[0]*2/4), int(SCREEN_RES[0]*3/4)]
 
     self.stick_rect = [ pygame.Rect(0, 0, self.stick_width, (self.disk_height+5)*qq+15) for qq in [1,2,3]]
     self.stick_pos = [ (qq, y - self.floor_height) for qq in self.sticks_y_pos]

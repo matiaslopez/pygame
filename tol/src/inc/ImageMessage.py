@@ -19,6 +19,11 @@ class ImageMessage(pygame.sprite.DirtySprite):
 
         self.hide()
 
+    def scale(self, x, y):
+        self.image = pygame.transform.scale(self.image, (x, y))
+        self.rect = self.image.get_rect()
+        self.dirty = True
+
     def hide(self):
         self.visible =  False
         self.dirty = True

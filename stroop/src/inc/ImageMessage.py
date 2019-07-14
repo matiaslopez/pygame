@@ -23,6 +23,11 @@ class ImageMessage(pygame.sprite.DirtySprite):
 
         self.hide()
 
+    def scale(self, x, y):
+        self.image = pygame.transform.smoothscale(self.image, (x, y))
+        self.rect = self.image.get_rect()
+        self.dirty = True
+
     def hide(self):
         # print "Hiding ", self.name
         self.visible =  False
@@ -45,14 +50,23 @@ class ImageButton(ImageMessage):
         self.image_pressed = pygame.image.load("./images/" + ("right"  if side else "left")
                             + "_pressed.png" ).convert_alpha()
 
+        x = pygame.display.get_surface().get_rect().width
+        y = pygame.display.get_surface().get_rect().height
+        img_done_side = min(int(x*1.0/7), int(y*1.0/5))
+        button_position = {0: (int(x*1.0/8), int(y*5.0/6)),
+                         1: (int(x*7.0/8), int(y*5.0/6))}
 
-        self.image_unpressed = pygame.transform.smoothscale(self.image_unpressed, (Properties.img_done_side,Properties.img_done_side))
-        self.image_pressed = pygame.transform.smoothscale(self.image_pressed, (Properties.img_done_side,Properties.img_done_side))
+        self.image_unpressed = pygame.transform.smoothscale(
+                                self.image_unpressed,
+                                (img_done_side, img_done_side))
+        self.image_pressed = pygame.transform.smoothscale(
+                                self.image_pressed,
+                                (img_done_side, img_done_side))
 
         self.image = self.image_unpressed
 
         self.rect = self.image.get_rect()
-        self.rect.center = Properties.button_position[self.side]
+        self.rect.center = button_position[self.side]
         # self.rect.center = (7.5 * (self.image.get_width() * 1.25), 6 * (self.image.get_height()* 1.25))
 
     def set_callback(self, callback):

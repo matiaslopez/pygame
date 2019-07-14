@@ -24,14 +24,14 @@ from inc.Stimulus import *
 
 INTERACTIVE, PASSIVE, FEEDBACK = [ p for p in range(0,3) ]
 
-SUBJECT_NAME = raw_input('Nombre: ')
-BACKGROUND_PROFILE = raw_input('Perfil de fondo (1, 2): ')
-STIM_PROFILE = raw_input('Perfil de piezas (1, 2): ')
+# SUBJECT_NAME = raw_input('Nombre: ')
+# BACKGROUND_PROFILE = raw_input('Perfil de fondo (1, 2): ')
+# STIM_PROFILE = raw_input('Perfil de piezas (1, 2): ')
 
 
-# SUBJECT_NAME = "Q"
-# BACKGROUND_PROFILE = "1"
-# STIM_PROFILE = "2"
+SUBJECT_NAME = "Q"
+BACKGROUND_PROFILE = "1"
+STIM_PROFILE = "2"
 
 
 class Stroop():
@@ -39,7 +39,7 @@ class Stroop():
     def __init__(self, experiment_data):
         self.logger = FileLogger(SUBJECT_NAME)
         self.experiment_data = experiment_data
-
+        SCREEN_RES = (int(experiment_data["screen_res"]["x"]), int(experiment_data["screen_res"]["y"]))
         self.screen = pygame.display.get_surface()
         self.clock = pygame.time.Clock()
 
@@ -50,6 +50,7 @@ class Stroop():
 
         # self.background = pygame.sprite.DirtySprite()
         self.background =  ImageMessage("background.png", BACKGROUND_PROFILE)
+        self.background.scale(SCREEN_RES[0], SCREEN_RES[1])
         self.background.show()
         self.sprites_group.add(self.background, layer=BACKGR_lyr)
 
@@ -64,6 +65,7 @@ class Stroop():
         self.msgs["end_block"] =  ImageMessage("endBlock.png", BACKGROUND_PROFILE)
 
         for v in self.msgs.itervalues():
+            v.scale(SCREEN_RES[0], SCREEN_RES[1])
             self.sprites_group.add(v, layer=MSG_lyr)
 
         self.feedback_ok = Feedback()
@@ -372,10 +374,12 @@ class Stroop():
         # pygame.image.save(pygame.display.get_surface(), "screenshot.png")
 
 def main():
-    pygame.init()
-    pygame.display.set_mode(Properties.SCREEN_RES)
     json_data=open("input.json").read()
     experiment_data = json.loads(json_data)
+    SCREEN_RES = (int(experiment_data["screen_res"]["x"]), int(experiment_data["screen_res"]["y"]))
+
+    pygame.init()
+    pygame.display.set_mode(SCREEN_RES)
 
 
     game = Stroop(experiment_data)

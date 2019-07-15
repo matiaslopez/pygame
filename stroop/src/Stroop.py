@@ -24,14 +24,14 @@ from inc.Stimulus import *
 
 INTERACTIVE, PASSIVE, FEEDBACK = [ p for p in range(0,3) ]
 
-# SUBJECT_NAME = raw_input('Nombre: ')
-# BACKGROUND_PROFILE = raw_input('Perfil de fondo (1, 2): ')
-# STIM_PROFILE = raw_input('Perfil de piezas (1, 2): ')
+SUBJECT_NAME = raw_input('Nombre: ')
+BACKGROUND_PROFILE = raw_input('Perfil de fondo (1, 2): ')
+STIM_PROFILE = raw_input('Perfil de piezas (1, 2): ')
 
 
-SUBJECT_NAME = "Q"
-BACKGROUND_PROFILE = "1"
-STIM_PROFILE = "2"
+# SUBJECT_NAME = "Q"
+# BACKGROUND_PROFILE = "1"
+# STIM_PROFILE = "2"
 
 
 class Stroop():
